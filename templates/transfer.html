@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Transfer</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      /* Provide enough bottom padding so content isn't hidden by footer */
+      padding-bottom: 220px;
+    }
+    /* Sidebar styles */
+    aside.sidebar {
+      width: 250px;
+      background: #f8f9fa;
+      height: 100vh;
+      padding: 20px;
+      position: fixed;
+      top: 0;
+      left: 0;
+    }
+    aside.sidebar img.country-flag {
+      width: 100%;
+      border-radius: 4px;
+      margin-bottom: 15px;
+    }
+    .profile-section {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .profile-section img {
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+    .profile-section h3 {
+      margin-top: 10px;
+    }
+    aside.sidebar nav a {
+      display: block;
+      margin-bottom: 10px;
+      color: #333;
+      text-decoration: none;
+    }
+    aside.sidebar nav a:hover {
+      text-decoration: underline;
+    }
+    /* Main Content */
+    .main-content {
+      margin-left: 270px;
+      padding: 20px;
+    }
+    .red-header {
+      background: red;
+      color: #fff;
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .logout-btn {
+      background: red;
+      border: 1px solid #fff;
+      color: #fff;
+      padding: 5px 10px;
+      border-radius: 3px;
+      text-decoration: none;
+    }
+    /* Editable Text Containers */
+    .editable-text-container {
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    /* Tab Buttons */
+    .tab-container {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    .tab-btn {
+      padding: 10px 20px;
+      border: 1px solid #ddd;
+      border-radius: 20px;
+      margin: 0 5px;
+      cursor: pointer;
+      background: #f1f1f1;
+    }
+    .tab-btn.active {
+      background: #007bff;
+      color: #fff;
+    }
+    /* Content Panels */
+    .content-panel {
+      display: none;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .content-panel.active {
+      display: block;
+    }
+    /* Deposit Panel Styles */
+    .grid-2x2 {
+      display: grid;
+      grid-template-columns: repeat(2, 50px);
+      grid-gap: 5px;
+      justify-content: center;
+      margin-bottom: 10px;
+    }
+    .grid-2x2 img {
+      width: 50px;
+      height: 50px;
+      cursor: pointer;
+    }
+    #selectedCryptoHeader {
+      margin: 10px auto;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 20px;
+      display: inline-flex;
+      align-items: center;
+    }
+    #selectedCryptoHeader img {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      margin-right: 10px;
+    }
+    .dropdown-container {
+      margin: 20px auto;
+      width: 300px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      padding: 10px;
+    }
+    #barcodeContainer, #walletAddressContainer, #warningContainer, #processingContainer {
+      margin: 20px auto;
+      width: 300px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+    #walletAddressContainer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    #warningContainer {
+      border: 1px solid #f5c6cb;
+      background: #f8d7da;
+    }
+    #processingContainer {
+      border: 1px solid #ffeeba;
+      background: #fff3cd;
+    }
+    .back-btn {
+      margin-bottom: 10px;
+    }
+    /* Withdraw Panel Styles */
+    #withdrawForm {
+      background: #e0f7fa;
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+    /* Merrill Lynch Protocol Text */
+    .protocol-text {
+      color: #666;
+      margin: 20px auto;
+      text-align: center;
+      max-width: 600px;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+    /* Footer Styles */
+    footer {
+      background-color: #000;
+      color: #fff;
+      padding: 40px 20px;
+      text-align: center;
+      margin-top: 40px;
+      width: 100%;
+    }
+    footer h3 {
+      margin-bottom: 15px;
+      font-size: 1.2rem;
+    }
+    footer .social-media a {
+      margin: 0 10px;
+      display: inline-block;
+      transition: transform 0.3s ease;
+    }
+    footer .social-media a:hover {
+      transform: scale(1.1);
+    }
+    footer .social-media img {
+      height: 32px;
+      width: auto;
+    }
+    footer .company-info {
+      margin-bottom: 30px;
+      line-height: 1.6;
+      font-size: 0.9rem;
+    }
+    footer .company-info a {
+      color: #fff;
+      text-decoration: underline;
+    }
+    footer .license-info {
+      margin-bottom: 30px;
+      font-size: 0.85rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    footer .license-info img {
+      height: 20px;
+      width: auto;
+      margin-right: 8px;
+    }
+    footer .partners {
+      margin-bottom: 30px;
+    }
+    footer .partners h3 {
+      margin-bottom: 15px;
+    }
+    footer .partners-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    footer .partners-container a {
+      display: block;
+      max-width: 150px;
+      width: 100%;
+    }
+    footer .partners-container img {
+      width: 100%;
+      height: auto;
+      object-fit: contain;
+      filter: brightness(0) invert(1);
+    }
+    footer .copyright {
+      font-size: 0.8rem;
+      margin-top: 20px;
+      border-top: 1px solid #444;
+      padding-top: 15px;
+    }
+    @media (max-width: 600px) {
+      footer { padding: 30px 10px; }
+      footer .social-media a { margin: 0 5px; }
+      footer .partners-container { gap: 10px; }
+    }
+  </style>
+</head>
+<body>
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="profile-section">
+      {% if user.profile_pic and user.profile_pic|trim %}
+        <img src="{{ url_for('static', filename='profile_pics/' ~ user.profile_pic) }}" alt="Profile Picture">
+      {% elif user.profile_pic_url and user.profile_pic_url|trim %}
+        <img src="{{ user.profile_pic_url }}" alt="Default Profile Picture">
+      {% else %}
+        <img src="https://files.catbox.moe/1nq0v5.png" alt="Default Profile Picture">
+      {% endif %}
+      <h3>{{ user.username }}</h3>
+      {% if user.country and user.country_flag %}
+        <p>{{ user.country }} {{ user.country_flag }}</p>
+      {% endif %}
+    </div>
+    <nav>
+      <a href="{{ url_for('dashboard') }}">Dashboard Home</a>
+      <a href="{{ url_for('trade') }}">Trade</a>
+      <a href="{{ url_for('staking_route') }}">Staking</a>
+      <a href="{{ url_for('my_stakes') }}">My Stakes</a>
+      <a href="{{ url_for('settings') }}">Settings</a>
+      <a href="{{ url_for('notifications') }}">Notifications</a>
+      <a href="{{ url_for('chat_advisors') }}">Chat <span id="dashboardChatBadge" style="display:none; background:red; color:white; border-radius:50%; padding:2px 6px; font-size:0.75rem;">New</span></a>
+      <a href="{{ url_for('transfer') }}">Transfer</a>
+      <a href="{{ url_for('news_feed') }}">News Feed</a>
+      <a href="{{ url_for('live_market') }}">Live Market</a>
+      <a href="{{ url_for('mining') }}">Mining</a>
+      <a href="{{ url_for('rewards_bonus') }}">Rewards & Bonus Stage</a>
+      <a href="{{ url_for('logout') }}">Logout</a>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <!-- Header -->
+    <div class="red-header">
+      <div class="header-username">{{ user.username }}</div>
+      <div class="header-logout">
+        <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+      </div>
+    </div>
+
+    <!-- Editable Text Containers -->
+    <div class="editable-text-container" style="background: {{ content_settings.transfer_text_color1 if content_settings and content_settings.transfer_text_color1 else '#f1f1f1' }};">
+      {{ content_settings.transfer_text1 if content_settings and content_settings.transfer_text1 else "Editable Text Container 1" }}
+    </div>
+    <div class="editable-text-container" style="background: {{ content_settings.transfer_text_color2 if content_settings and content_settings.transfer_text_color2 else '#f1f1f1' }};">
+      {{ content_settings.transfer_text2 if content_settings and content_settings.transfer_text2 else "Editable Text Container 2" }}
+    </div>
+
+    <!-- Tab Buttons -->
+    <div class="tab-container">
+      <div class="tab-btn active" id="depositTab">Deposit</div>
+      <div class="tab-btn" id="withdrawTab">Withdraw</div>
+    </div>
+
+    <!-- Deposit Panel -->
+    <div id="depositPanel" class="content-panel active">
+      <h4 class="text-center">Deposit Funds</h4>
+      <!-- Crypto Selection Grid -->
+      <div id="cryptoSelection" class="text-center" style="cursor:pointer;">
+        <p>Select Crypto Payment</p>
+        <div class="grid-2x2">
+          <img src="{{ content_settings.crypto_details['BTC']['logo'] if content_settings and content_settings.crypto_details and content_settings.crypto_details['BTC'] and content_settings.crypto_details['BTC']['logo'] else 'https://files.catbox.moe/d5loxc.png' }}" alt="BTC Logo">
+          <img src="{{ content_settings.crypto_details['ETH']['logo'] if content_settings and content_settings.crypto_details and content_settings.crypto_details['ETH'] and content_settings.crypto_details['ETH']['logo'] else 'https://files.catbox.moe/9wsimm.png' }}" alt="ETH Logo">
+          <img src="{{ content_settings.crypto_details['Polygon']['logo'] if content_settings and content_settings.crypto_details and content_settings.crypto_details['Polygon'] and content_settings.crypto_details['Polygon']['logo'] else 'https://files.catbox.moe/pqrfce.png' }}" alt="Polygon Logo">
+          <img src="{{ content_settings.crypto_details['BNB']['logo'] if content_settings and content_settings.crypto_details and content_settings.crypto_details['BNB'] and content_settings.crypto_details['BNB']['logo'] else 'https://files.catbox.moe/9cg09w.png' }}" alt="BNB Logo">
+        </div>
+        <small>Click to proceed with crypto deposit</small>
+      </div>
+
+      <!-- Deposit Interface (hidden initially) -->
+      <div id="cryptoDepositInterface" class="text-center" style="display:none;">
+        <!-- Back Button -->
+        <button id="backBtn" class="btn btn-secondary back-btn">Back</button>
+        <!-- Selected Crypto Header -->
+        <div id="selectedCryptoHeader" style="display:none;">
+          <img id="selectedCryptoLogo" src="" alt="Crypto Logo">
+          <span id="selectedCryptoName" style="font-weight:bold;"></span>
+        </div>
+        <!-- Dropdown for Crypto Selection -->
+        <div class="dropdown-container">
+          <select id="cryptoDropdown" class="form-control">
+            <option value="">Select Crypto</option>
+            {% for symbol in ["BTC","ETH","Polygon","BNB","AlGo","BCH","Celo","CRO","AVAX","LTC","ETC","Doge","SOLANA","TRX","TON","XRP"] %}
+              <option value="{{ symbol }}">{{ symbol }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <!-- Barcode, Wallet, Warning, Processing -->
+        <div id="barcodeContainer" style="display:none;">
+          <img id="barcodeImage" src="" alt="Barcode" style="max-width:100%;">
+        </div>
+        <div id="walletAddressContainer" style="display:none;">
+          <span id="walletAddress" style="word-break: break-all;"></span>
+          <button id="copyButton" class="btn btn-outline-secondary btn-sm">Copy</button>
+        </div>
+        <div id="warningContainer" style="display:none;">
+          <span>⚠️</span>
+          <span id="warningText"></span>
+        </div>
+        <div id="processingContainer" style="display:none;">
+          <span>⏰</span>
+          <span>Deposit processing time may vary depending on blockchain confirmation.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Withdraw Panel -->
+    <div id="withdrawPanel" class="content-panel">
+      <h4 class="text-center">Withdraw Funds</h4>
+      <form id="withdrawForm" action="{{ url_for('withdraw') }}" method="POST">
+        <div class="form-group">
+          <label for="withdrawDropdown">Select Crypto Holding</label>
+          <select id="withdrawDropdown" name="crypto" class="form-control">
+            <option value="">Select Crypto</option>
+            {% for crypto, balance in holdings.items() %}
+              <option value="{{ crypto }}">{{ crypto }} - {{ balance }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="withdrawWallet">Destination Wallet Address</label>
+          <input type="text" name="wallet" id="withdrawWallet" class="form-control" placeholder="Enter wallet address">
+        </div>
+        <div class="form-group">
+          <label for="withdrawAmount">Amount to Withdraw</label>
+          <input type="number" name="amount" id="withdrawAmount" class="form-control" placeholder="Enter amount" step="any">
+        </div>
+        <div id="feeContainer" style="background: #fff; padding: 10px; border-radius: 5px; margin-bottom:10px;">
+          <p>Fee: <span id="feeAmount">0.0000</span> (1% fee)</p>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Withdraw</button>
+      </form>
+    </div>
+
+    <!-- Merrill Lynch Protocol Text -->
+    <div class="protocol-text">
+      <p><strong>Merrill Lynch | Bank of America®</strong> 🇺🇸</p>
+      <p>
+        All deposits and withdrawals are processed securely through our trusted financial network. Please ensure that all transaction details are accurate before proceeding. Processing times may vary based on the selected payment method and security verification. Merrill Lynch and Bank of America® remain committed to providing a seamless and secure trading experience, with funds protected by industry-leading security protocols.
+      </p>
+      <p>For assistance, contact our support team. Trade with confidence.</p>
+    </div>
+
+    <!-- NEW FOOTER -->
+    <footer>
+      <div class="footer-container">
+        <!-- Social Media Links -->
+        <div class="social-media">
+          <h3>Follow Us on Social Media</h3>
+          <a href="https://facebook.com" target="_blank">
+            <img src="https://files.catbox.moe/sbm1q6.png" alt="Facebook">
+          </a>
+          <a href="https://instagram.com" target="_blank">
+            <img src="https://files.catbox.moe/tr50zg.png" alt="Instagram">
+          </a>
+          <a href="https://twitter.com" target="_blank">
+            <img src="https://files.catbox.moe/l3qz5f.png" alt="Twitter">
+          </a>
+          <a href="https://telegram.org" target="_blank">
+            <img src="https://files.catbox.moe/8fmms9.png" alt="Telegram">
+          </a>
+          <a href="https://discord.com" target="_blank">
+            <img src="https://files.catbox.moe/865025.png" alt="Discord">
+          </a>
+        </div>
+        <!-- Company Info -->
+        <div class="company-info">
+          <p>
+            Bank of America Merrill Lynch® is a premier global financial institution dedicated to delivering world-class financial solutions. Our commitment to integrity, innovation, and exemplary customer service underpins our legacy.
+          </p>
+          <p>
+            By accessing and using this website, you agree to our <a href="/terms" style="color: #fff;">Terms and Conditions</a> and <a href="/privacy" style="color: #fff;">Privacy Policy</a>.
+          </p>
+        </div>
+        <!-- License Info -->
+        <div class="license-info">
+          <img src="https://files.catbox.moe/fef885.png" alt="License">
+          <span>Insured &amp; Trusted</span>
+        </div>
+        <!-- Partner With -->
+        <div class="partners">
+          <h3>Our Partners</h3>
+          <div class="partners-container">
+            <a href="#" target="_blank"><img src="https://files.catbox.moe/epntm4.png" alt="Partner"></a>
+          </div>
+        </div>
+        <!-- Copyright -->
+        <div class="copyright">
+          <p>&copy; 2025 Bank of America Merrill Lynch®. All rights reserved.</p>
+        </div>
+      </div>
+    </footer>
+    <!-- End Footer -->
+
+  </div>
+  <!-- End Main Content -->
+
+  <script>
+    // Tab switching for panels
+    document.getElementById('depositTab').addEventListener('click', function(){
+      this.classList.add('active');
+      document.getElementById('withdrawTab').classList.remove('active');
+      document.getElementById('depositPanel').classList.add('active');
+      document.getElementById('withdrawPanel').classList.remove('active');
+    });
+    document.getElementById('withdrawTab').addEventListener('click', function(){
+      this.classList.add('active');
+      document.getElementById('depositTab').classList.remove('active');
+      document.getElementById('withdrawPanel').classList.add('active');
+      document.getElementById('depositPanel').classList.remove('active');
+    });
+
+    // When crypto selection grid is clicked, hide it and show deposit interface
+    document.getElementById('cryptoSelection').addEventListener('click', function(){
+      this.style.display = 'none';
+      document.getElementById('cryptoDepositInterface').style.display = 'block';
+    });
+
+    // Back button for deposit interface to return to selection grid
+    document.getElementById('backBtn').addEventListener('click', function(){
+      document.getElementById('cryptoDepositInterface').style.display = 'none';
+      document.getElementById('cryptoSelection').style.display = 'block';
+      document.getElementById('selectedCryptoHeader').style.display = 'none';
+      document.getElementById('barcodeContainer').style.display = 'none';
+      document.getElementById('walletAddressContainer').style.display = 'none';
+      document.getElementById('warningContainer').style.display = 'none';
+      document.getElementById('processingContainer').style.display = 'none';
+      document.getElementById('cryptoDropdown').value = "";
+    });
+
+    // Crypto details mapping – using admin-updated details if available; fallback to defaults
+    const cryptoData = {
+      "BTC": {
+        name: "BTC",
+        wallet: "{{ content_settings.crypto_details['BTC']['wallet'] if content_settings and content_settings.crypto_details and content_settings.crypto_details['BTC'] and content_settings.crypto_details['BTC']['wallet'] else 'bc1q7huz5xewqpsrdar3mjyz9z2c6htqf97zux0a84' }}",
+        barcode: "{{ content_settings.crypto_details['BTC']['barcode'] if content_settings and content_settings.crypto_details and content_settings.crypto_details['BTC'] and content_settings.crypto_details['BTC']['barcode'] else 'https://files.catbox.moe/1tdz7t.png' }}",
+        logo: "{{ content_settings.crypto_details['BTC']['logo'] if content_settings and content_settings.crypto_details and content_settings.crypto_details['BTC'] and content_settings.crypto_details['BTC']['logo'] else 'https://files.catbox.moe/d5loxc.png' }}"
+      },
+      "ETH": {
+        name: "ETH",
+        wallet: "{{ content_settings.crypto_details['ETH']['wallet'] if content_settings and content_settings.crypto_details and content_settings.crypto_details['ETH'] and content_settings.crypto_details['ETH']['wallet'] else '0x1EF8fB2C62846824976C60d7C340104Ea98a3b5a' }}",
+        barcode: "{{ content_settings.crypto_details['ETH']['barcode'] if content_settings and content_settings.crypto_details and content_settings.crypto_details['ETH'] and content_settings.crypto_details['ETH']['barcode'] else 'https://files.catbox.moe/2l8etm.png' }}",
+        logo: "{{ content_settings.crypto_details['ETH']['logo'] if content_settings and content_settings.crypto_details and content_settings.crypto_details['ETH'] and content_settings.crypto_details['ETH']['logo'] else 'https://files.catbox.moe/9wsimm.png' }}"
+      },
+      "Polygon": {
+        name: "Polygon",
+        wallet: "{{ content_settings.crypto_details['Polygon']['wallet'] if content_settings and content_settings.crypto_details and content_settings.crypto_details['Polygon'] and content_settings.crypto_details['Polygon']['wallet'] else '0x1EF8fB2C62846824976C60d7C340104Ea98a3b5a' }}",
+        barcode: "{{ content_settings.crypto_details['Polygon']['barcode'] if content_settings and content_settings.crypto_details and content_settings.crypto_details['Polygon'] and content_settings.crypto_details['Polygon']['barcode'] else 'https://files.catbox.moe/up4ros.png' }}",
+        logo: "{{ content_settings.crypto_details['Polygon']['logo'] if content_settings and content_settings.crypto_details and content_settings.crypto_details['Polygon'] and content_settings.crypto_details['Polygon']['logo'] else 'https://files.catbox.moe/pqrfce.png' }}"
+      },
+      "BNB": {
+        name: "BNB",
+        wallet: "{{ content_settings.crypto_details['BNB']['wallet'] if content_settings and content_settings.crypto_details and content_settings.crypto_details['BNB'] and content_settings.crypto_details['BNB']['wallet'] else '0x1EF8fB2C62846824976C60d7C340104Ea98a3b5a' }}",
+        barcode: "{{ content_settings.crypto_details['BNB']['barcode'] if content_settings and content_settings.crypto_details and content_settings.crypto_details['BNB'] and content_settings.crypto_details['BNB']['barcode'] else 'https://files.catbox.moe/up4ros.png' }}",
+        logo: "{{ content_settings.crypto_details['BNB']['logo'] if content_settings and content_settings.crypto_details and content_settings.crypto_details['BNB'] and content_settings.crypto_details['BNB']['logo'] else 'https://files.catbox.moe/9cg09w.png' }}"
+      },
+      "AlGo": {
+        name: "AlGo",
+        wallet: "{{ content_settings.crypto_details['AlGo']['wallet'] if content_settings and content_settings.crypto_details and content_settings.crypto_details['AlGo'] and content_settings.crypto_details['AlGo']['wallet'] else 'OJWMVHXXTRCFP4YWXF23SRQ3WJFCELNOEAZRFZ2XBLPRRO7O6WHGIHIPYA' }}",
+        barcode: "{{ content_settings.crypto_details['AlGo']['barcode'] if content_settings and content_settings.crypto_details and content_settings.crypto_details['AlGo'] and content_settings.crypto_details['AlGo']['barcode'] else 'https://files.catbox.moe/f3k07o.png' }}",
+        logo: "{{ content_settings.crypto_details['AlGo']['logo'] if content_settings and content_settings.crypto_details and content_settings.crypto_details['AlGo'] and content_settings.crypto_details['AlGo']['logo'] else 'https://files.catbox.moe/w3uvom.png' }}"
+      },
+      "BCH": {
+        name: "BCH",
+        wallet: "{{ content_settings.crypto_details['BCH']['wallet'] if content_settings and content_settings.crypto_details and content_settings.crypto_details['BCH'] and content_settings.crypto_details['BCH']['wallet'] else 'qpal96un6sw65pqet3ae5xqqr46vvh42es7dwff6yh' }}",
+        barcode: "{{ content_settings.crypto_details['BCH']['barcode'] if content_settings and content_settings.crypto_details and content_settings.crypto_details['BCH'] and content_settings.crypto_details['BCH']['barcode'] else 'https://files.catbox.moe/zwxk7n.png' }}",
+        logo: "{{ content_settings.crypto_details['BCH']['logo'] if content_settings and content_settings.crypto_details and content_settings.crypto_details['BCH'] and content_settings.crypto_details['BCH']['logo'] else 'https://files.catbox.moe/l5665s.png' }}"
+      },
+      "Celo": {
+        name: "Celo",
+        wallet: "{{ content_settings.crypto_details['Celo']['wallet'] if content_settings and content_settings.crypto_details and content_settings.crypto_details['Celo'] and content_settings.crypto_details['Celo']['wallet'] else '0x1EF8fB2C62846824976C60d7C340104Ea98a3b5a' }}",
+        barcode: "{{ content_settings.crypto_details['Celo']['barcode'] if content_settings and content_settings.crypto_details and content_settings.crypto_details['Celo'] and content_settings.crypto_details['Celo']['barcode'] else 'https://files.catbox.moe/m97fjz.png' }}",
+        logo: "{{ content_settings.crypto_details['Celo']['logo'] if content_settings and content_settings.crypto_details and content_settings.crypto_details['Celo'] and content_settings.crypto_details['Celo']['logo'] else 'https://files.catbox.moe/rplntl.png' }}"
+      },
+      "CRO": {
+        name: "CRO",
+        wallet: "{{ content_settings.crypto_details['CRO']['wallet'] if content_settings and content_settings.crypto_details and content_settings.crypto_details['CRO'] and content_settings.crypto_details['CRO']['wallet'] else '0x1EF8fB2C62846824976C60d7C340104Ea98a3b5a' }}",
+        barcode: "{{ content_settings.crypto_details['CRO']['barcode'] if content_settings and content_settings.crypto_details and content_settings.crypto_details['CRO'] and content_settings.crypto_details['CRO']['barcode'] else 'https://files.catbox.moe/anm1mi.png' }}",
+        logo: "{{ content_settings.crypto_details['CRO']['logo'] if content_settings and content_settings.crypto_details and content_settings.crypto_details['CRO'] and content_settings.crypto_details['CRO']['logo'] else 'https://via.placeholder.com/50' }}"
+      },
+      "AVAX": {
+        name: "AVAX",
+        wallet: "{{ content_settings.crypto_details['AVAX']['wallet'] if content_settings and content_settings.crypto_details and content_settings.crypto_details['AVAX'] and content_settings.crypto_details['AVAX']['wallet'] else '0x1EF8fB2C62846824976C60d7C340104Ea98a3b5a' }}",
+        barcode: "{{ content_settings.crypto_details['AVAX']['barcode'] if content_settings and content_settings.crypto_details and content_settings.crypto_details['AVAX'] and content_settings.crypto_details['AVAX']['barcode'] else 'https://files.catbox.moe/uxrvp2.png' }}",
+        logo: "{{ content_settings.crypto_details['AVAX']['logo'] if content_settings and content_settings.crypto_details and content_settings.crypto_details['AVAX'] and content_settings.crypto_details['AVAX']['logo'] else 'https://via.placeholder.com/50' }}"
+      },
+      "LTC": {
+        name: "LTC",
+        wallet: "{{ content_settings.crypto_details['LTC']['wallet'] if content_settings and content_settings.crypto_details and content_settings.crypto_details['LTC'] and content_settings.crypto_details['LTC']['wallet'] else 'ltc1qa70rp4z40cq4vs406qxy4skx32jzgad69zxg2t' }}",
+        barcode: "{{ content_settings.crypto_details['LTC']['barcode'] if content_settings and content_settings.crypto_details and content_settings.crypto_details['LTC'] and content_settings.crypto_details['LTC']['barcode'] else 'https://files.catbox.moe/y6aqs3.png' }}",
+        logo: "{{ content_settings.crypto_details['LTC']['logo'] if content_settings and content_settings.crypto_details and content_settings.crypto_details['LTC'] and content_settings.crypto_details['LTC']['logo'] else 'https://files.catbox.moe/t6cfeo.png' }}"
+      },
+      "ETC": {
+        name: "ETC",
+        wallet: "{{ content_settings.crypto_details['ETC']['wallet'] if content_settings and content_settings.crypto_details and content_settings.crypto_details['ETC'] and content_settings.crypto_details['ETC']['wallet'] else '0xeE15aFec16357Ab0cB3A9Bb0b52656Bf758A4fb7' }}",
+        barcode: "{{ content_settings.crypto_details['ETC']['barcode'] if content_settings and content_settings.crypto_details and content_settings.crypto_details['ETC'] and content_settings.crypto_details['ETC']['barcode'] else 'https://files.catbox.moe/16iq6c.png' }}",
+        logo: "{{ content_settings.crypto_details['ETC']['logo'] if content_settings and content_settings.crypto_details and content_settings.crypto_details['ETC'] and content_settings.crypto_details['ETC']['logo'] else 'https://via.placeholder.com/50' }}"
+      },
+      "Doge": {
+        name: "Doge",
+        wallet: "{{ content_settings.crypto_details['Doge']['wallet'] if content_settings and content_settings.crypto_details and content_settings.crypto_details['Doge'] and content_settings.crypto_details['Doge']['wallet'] else 'DRFxkKfj4ABVZj1jmYCUicgEbLPk8dLVgV' }}",
+        barcode: "{{ content_settings.crypto_details['Doge']['barcode'] if content_settings and content_settings.crypto_details and content_settings.crypto_details['Doge'] and content_settings.crypto_details['Doge']['barcode'] else 'https://files.catbox.moe/95r6p4.png' }}",
+        logo: "{{ content_settings.crypto_details['Doge']['logo'] if content_settings and content_settings.crypto_details and content_settings.crypto_details['Doge'] and content_settings.crypto_details['Doge']['logo'] else 'https://files.catbox.moe/5q7gb4.png' }}"
+      },
+      "SOLANA": {
+        name: "SOLANA",
+        wallet: "{{ content_settings.crypto_details['SOLANA']['wallet'] if content_settings and content_settings.crypto_details and content_settings.crypto_details['SOLANA'] and content_settings.crypto_details['SOLANA']['wallet'] else '9w4HSUHeigJfr4cdSGWhonf5CHTjERXBVV1BWtSdxrMv' }}",
+        barcode: "{{ content_settings.crypto_details['SOLANA']['barcode'] if content_settings and content_settings.crypto_details and content_settings.crypto_details['SOLANA'] and content_settings.crypto_details['SOLANA']['barcode'] else 'https://files.catbox.moe/8acpj5.png' }}",
+        logo: "{{ content_settings.crypto_details['SOLANA']['logo'] if content_settings and content_settings.crypto_details and content_settings.crypto_details['SOLANA'] and content_settings.crypto_details['SOLANA']['logo'] else 'https://files.catbox.moe/5q7gb4.png' }}"
+      },
+      "TRX": {
+        name: "TRX",
+        wallet: "{{ content_settings.crypto_details['TRX']['wallet'] if content_settings and content_settings.crypto_details and content_settings.crypto_details['TRX'] and content_settings.crypto_details['TRX']['wallet'] else 'TGgW1rVrbnpRZs9nJDHkYkM4uZumVHZyrR' }}",
+        barcode: "{{ content_settings.crypto_details['TRX']['barcode'] if content_settings and content_settings.crypto_details and content_settings.crypto_details['TRX'] and content_settings.crypto_details['TRX']['barcode'] else 'https://files.catbox.moe/mto5gt.png' }}",
+        logo: "{{ content_settings.crypto_details['TRX']['logo'] if content_settings and content_settings.crypto_details and content_settings.crypto_details['TRX'] and content_settings.crypto_details['TRX']['logo'] else 'https://files.catbox.moe/prn33q.png' }}"
+      },
+      "TON": {
+        name: "TON",
+        wallet: "{{ content_settings.crypto_details['TON']['wallet'] if content_settings and content_settings.crypto_details and content_settings.crypto_details['TON'] and content_settings.crypto_details['TON']['wallet'] else 'UQBsD_XD59RjE5b2GuAW6kWK3q86Oc08LbmTfGRClCJl0J-0' }}",
+        barcode: "{{ content_settings.crypto_details['TON']['barcode'] if content_settings and content_settings.crypto_details and content_settings.crypto_details['TON'] and content_settings.crypto_details['TON']['barcode'] else 'https://files.catbox.moe/9v3yi7.png' }}",
+        logo: "{{ content_settings.crypto_details['TON']['logo'] if content_settings and content_settings.crypto_details and content_settings.crypto_details['TON'] and content_settings.crypto_details['TON']['logo'] else 'https://files.catbox.moe/prn33q.png' }}"
+      },
+      "XRP": {
+        name: "XRP",
+        wallet: "{{ content_settings.crypto_details['XRP']['wallet'] if content_settings and content_settings.crypto_details and content_settings.crypto_details['XRP'] and content_settings.crypto_details['XRP']['wallet'] else 'rD16Jfm2pkeqc7W9ra48kTm5s88otJc8dZ' }}",
+        barcode: "{{ content_settings.crypto_details['XRP']['barcode'] if content_settings and content_settings.crypto_details and content_settings.crypto_details['XRP'] and content_settings.crypto_details['XRP']['barcode'] else 'https://files.catbox.moe/y2hvd0.png' }}",
+        logo: "{{ content_settings.crypto_details['XRP']['logo'] if content_settings and content_settings.crypto_details and content_settings.crypto_details['XRP'] and content_settings.crypto_details['XRP']['logo'] else 'https://files.catbox.moe/prn33q.png' }}"
+      }
+    };
+
+    document.getElementById('cryptoDropdown').addEventListener('change', function(){
+      const selected = this.value;
+      if(selected && cryptoData[selected]){
+        const data = cryptoData[selected];
+        document.getElementById('selectedCryptoLogo').src = data.logo;
+        document.getElementById('selectedCryptoName').textContent = data.name;
+        document.getElementById('selectedCryptoHeader').style.display = 'inline-flex';
+        document.getElementById('barcodeImage').src = data.barcode;
+        document.getElementById('barcodeContainer').style.display = 'block';
+        document.getElementById('walletAddress').textContent = data.wallet;
+        document.getElementById('walletAddressContainer').style.display = 'flex';
+        document.getElementById('warningText').textContent = "Only send " + data.name + " crypto to this address & network";
+        document.getElementById('warningContainer').style.display = 'block';
+        document.getElementById('processingContainer').style.display = 'block';
+      } else {
+        document.getElementById('selectedCryptoHeader').style.display = 'none';
+        document.getElementById('barcodeContainer').style.display = 'none';
+        document.getElementById('walletAddressContainer').style.display = 'none';
+        document.getElementById('warningContainer').style.display = 'none';
+        document.getElementById('processingContainer').style.display = 'none';
+      }
+    });
+
+    document.getElementById('copyButton').addEventListener('click', function(){
+      const walletAddress = document.getElementById('walletAddress').textContent;
+      navigator.clipboard.writeText(walletAddress).then(function(){
+        alert('Copied!');
+      }, function(){
+        alert('Failed to copy!');
+      });
+    });
+
+    document.getElementById('withdrawAmount').addEventListener('input', function(){
+      const amount = parseFloat(this.value) || 0;
+      const fee = amount * 0.01;
+      document.getElementById('feeAmount').textContent = fee.toFixed(4);
+    });
+  </script>
+</body>
+</html>

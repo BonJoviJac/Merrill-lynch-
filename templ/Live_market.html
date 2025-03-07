@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Crypto Market</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: white;
+            margin: 20px;
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        /* Candlestick Chart */
+        .candlestick-container {
+            max-width: 90%;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .candlestick-chart {
+            width: 100%;
+            height: 300px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            position: relative;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.1);
+            padding: 15px;
+        }
+        .candle {
+            width: 10px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            flex-direction: column;
+        }
+        .wick {
+            width: 2px;
+            background: black;
+            position: absolute;
+        }
+        .candle-body {
+            width: 100%;
+            position: absolute;
+        }
+        .green {
+            background: green;
+        }
+        .red {
+            background: red;
+        }
+
+        /* Heatmap */
+        .heatmap-container {
+            max-width: 90%;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .heatmap-box {
+            padding: 20px;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: bold;
+            color: white;
+            transition: background-color 0.5s ease;
+            text-align: center;
+        }
+
+        /* Market Table */
+        .market-container {
+            max-width: 90%;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            background-color: white;
+        }
+        th, td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+            font-size: 14px;
+        }
+        th {
+            background-color: #f8f8f8;
+            font-weight: bold;
+        }
+        .up {
+            color: #008000;
+            font-weight: bold;
+        }
+        .down {
+            color: #ff0000;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Candlestick Chart Container -->
+<div class="candlestick-container">
+    <h2>Live Crypto Candlestick Chart</h2>
+    <div class="candlestick-chart" id="candlestickChart"></div>
+</div>
+
+<!-- Heatmap Container -->
+<div class="heatmap-container">
+    <h2>Live Crypto Heatmap</h2>
+    <div class="grid-container" id="heatmapGrid"></div>
+</div>
+
+<!-- Market Table Container -->
+<div class="market-container">
+    <h2>Live Cryptocurrency Market</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Coin</th>
+                <th>Bid Price (USD)</th>
+                <th>Ask Price (USD)</th>
+                <th>Change</th>
+            </tr>
+        </thead>
+        <tbody id="marketData"></tbody>
+    </table>
+</div>
+
+<script>
+    // Generate Candlestick Chart
+    function generateCandles() {
+        const chart = document.getElementById("candlestickChart");
+        chart.innerHTML = ""; // Clear previous data
+
+        for (let i = 0; i < 20; i++) {
+            let open = Math.random() * 100 + 200;
+            let close = Math.random() * 100 + 200;
+            let high = Math.max(open, close) + Math.random() * 10;
+            let low = Math.min(open, close) - Math.random() * 10;
+            
+            let color = close >= open ? "green" : "red";
+            let candleHeight = Math.abs(close - open);
+            let wickHeight = high - low;
+
+            let candle = document.createElement("div");
+            candle.classList.add("candle");
+
+            let wick = document.createElement("div");
+            wick.classList.add("wick");
+            wick.style.height = wickHeight + "px";
+            wick.style.bottom = low + "px";
+
+            let body = document.createElement("div");
+            body.classList.add("candle-body", color);
+            body.style.height = candleHeight + "px";
+            body.style.bottom = Math.min(open, close) + "px";
+
+            candle.appendChild(wick);
+            candle.appendChild(body);
+            chart.appendChild(candle);
+        }
+    }
+
+    setInterval(generateCandles, 3000); // Update every 3 seconds
+    generateCandles();
+
+    // Generate Heatmap
+    const coins = ["BTC", "ETH", "BNB", "XRP", "ADA", "SOL", "DOGE", "DOT", "MATIC", "LTC"];
+
+    function createHeatmap() {
+        let heatmapHTML = "";
+        coins.forEach(coin => {
+            heatmapHTML += `<div id="${coin}" class="heatmap-box">${coin}</div>`;
+        });
+        document.getElementById("heatmapGrid").innerHTML = heatmapHTML;
+    }
+
+    function updateHeatmap() {
+        coins.forEach(coin => {
+            let element = document.getElementById(coin);
+            let priceChange = (Math.random() * 2 - 1).toFixed(2);
+            let color = priceChange >= 0 ? `rgb(0, ${Math.min(255, 100 + priceChange * 80)}, 0)` : `rgb(${Math.min(255, 100 + Math.abs(priceChange) * 80)}, 0, 0)`;
+            element.style.backgroundColor = color;
+            element.textContent = `${coin} ${priceChange}%`;
+        });
+    }
+
+    createHeatmap();
+    setInterval(updateHeatmap, 2000);
+
+    // Generate Market Data
+    function getRandomPrice(base, range) {
+        return (base + (Math.random() * range - (range / 2))).toFixed(2);
+    }
+
+    function updateMarketData() {
+        let marketDataHTML = "";
+        coins.forEach(coin => {
+            let bid = getRandomPrice(100, 20);
+            let ask = (parseFloat(bid) + (Math.random() * 5)).toFixed(2);
+            let change = (Math.random() * 2 - 1).toFixed(2);
+            let changeClass = change >= 0 ? "up" : "down";
+
+            marketDataHTML += `
+                <tr>
+                    <td>${coin}</td>
+                    <td>$${bid}</td>
+                    <td>$${ask}</td>
+                    <td class="${changeClass}">${change}%</td>
+                </tr>
+            `;
+        });
+
+        document.getElementById("marketData").innerHTML = marketDataHTML;
+    }
+
+    updateMarketData();
+    setInterval(updateMarketData, 2000);
+</script>
+
+</body>
+</html>

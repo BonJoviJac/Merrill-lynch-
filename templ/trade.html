@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Open Trade</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+        .container {
+            width: 90%;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        h2 {
+            color: #333;
+        }
+        .chart-container {
+            width: 100%;
+            height: 400px;
+            margin-bottom: 20px;
+        }
+        .trade-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        select, input {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .trade-buttons {
+            display: flex;
+            justify-content: space-between;
+        }
+        .trade-buttons button {
+            width: 48%;
+            padding: 15px;
+            font-size: 16px;
+            border: none;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .buy-btn { background: green; }
+        .sell-btn { background: red; }
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        }
+        .popup button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px;
+            margin-top: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Open Trade</h2>
+    
+    <!-- TradingView Candlestick Chart -->
+    <div class="chart-container">
+        <iframe src="https://s.tradingview.com/embed-widget/ticker-tape/?symbols=COINBASE:BTCUSD,COINBASE:ETHUSD,COINBASE:BNBUSD" width="100%" height="100%" frameborder="0"></iframe>
+    </div>
+
+    <!-- Trade Form -->
+    <form class="trade-form" id="tradeForm">
+        <select id="asset">
+            <option value="BTC">Bitcoin (BTC)</option>
+            <option value="ETH">Ethereum (ETH)</option>
+            <option value="DOGE">Dogecoin (DOGE)</option>
+            <option value="BNB">Binance Coin (BNB)</option>
+        </select>
+
+        <select id="lotSize">
+            <option value="0.001">0.001</option>
+            <option value="0.01">0.01</option>
+            <option value="0.1">0.1</option>
+            <option value="1">1</option>
+            <option value="10">10</option>
+            <option value="100">100</option>
+        </select>
+
+        <input type="number" id="amount" placeholder="Enter Amount ($)" min="1">
+
+        <div class="trade-buttons">
+            <button type="button" class="buy-btn" onclick="placeTrade('Buy')">BUY</button>
+            <button type="button" class="sell-btn" onclick="placeTrade('Sell')">SELL</button>
+        </div>
+    </form>
+</div>
+
+<!-- Trade Confirmation Popup -->
+<div class="popup" id="tradePopup">
+    <h3 id="tradeResult"></h3>
+    <p id="tradeDetails"></p>
+    <button onclick="closePopup()">OK</button>
+</div>
+
+<script>
+    function placeTrade(type) {
+        let asset = document.getElementById("asset").value;
+        let lotSize = parseFloat(document.getElementById("lotSize").value);
+        let amount = parseFloat(document.getElementById("amount").value);
+
+        let priceData = { "BTC": 50000, "ETH": 3500, "DOGE": 0.12, "BNB": 400 };
+        let entryPrice = priceData[asset];
+
+        let marginRequired = (lotSize * entryPrice) / 10; // Example leverage 10x
+
+        let userBalance = 10000;  // Fake balance, replace with real value from backend
+
+        if (amount < marginRequired) {
+            alert("Insufficient balance to open trade!");
+            return;
+        }
+
+        let priceChange = entryPrice * 0.05;
+        let potentialProfit = priceChange * lotSize;
+        let potentialLoss = -potentialProfit;
+
+        let tradeOutcome = type === "Buy" ? 
+            `If price goes up: +$${potentialProfit.toFixed(2)}\nIf price goes down: -$${potentialLoss.toFixed(2)}` :
+            `If price goes down: +$${potentialProfit.toFixed(2)}\nIf price goes up: -$${potentialLoss.toFixed(2)}`;
+
+        document.getElementById("tradeResult").innerText = `${type} Order Executed!`;
+        document.getElementById("tradeDetails").innerText = `Trade: ${type} ${lotSize} ${asset} @ $${entryPrice}\n${tradeOutcome}`;
+        
+        document.getElementById("tradePopup").style.display = "block";
+    }
+
+    function closePopup() {
+        document.getElementById("tradePopup").style.display = "none";
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Notifications</title>
+  <style>
+    /* Container Layout */
+    .container {
+      display: flex;
+      height: 100vh;
+      font-family: Arial, sans-serif;
+    }
+    /* Sidebar (same as in user_dashboard) */
+    .sidebar {
+      width: 240px;
+      background: #fff;
+      border-right: 1px solid #ccc;
+      padding: 20px;
+    }
+    .sidebar .profile-section {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .sidebar .profile-section img {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 10px;
+    }
+    .sidebar .profile-section h3 {
+      font-size: 1.1rem;
+      color: #333;
+    }
+    .sidebar .profile-section p {
+      font-size: 0.9rem;
+      color: #555;
+    }
+    .sidebar nav a {
+      display: block;
+      text-decoration: none;
+      color: #333;
+      padding: 10px 0;
+      border-bottom: 1px solid #eee;
+      font-size: 0.95rem;
+    }
+    .sidebar nav a:hover {
+      background: #f2f2f2;
+    }
+    /* Main Content Area */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    /* Notification Header */
+    .notification-header {
+      background-color: red;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      padding: 15px;
+    }
+    .notification-header h2 {
+      margin: 0;
+      font-size: 1.2rem;
+      text-align: center;
+      width: 100%;
+    }
+    .notification-header .logout-btn {
+      position: absolute;
+      right: 15px;
+      border: 1px solid #fff;
+      padding: 5px 10px;
+      border-radius: 4px;
+      text-decoration: none;
+      color: #fff;
+      font-size: 0.9rem;
+    }
+    .notification-header .logout-btn:hover {
+      background-color: rgba(255,255,255,0.2);
+    }
+    /* Notifications List */
+    .notifications-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      background: #f9f9f9;
+    }
+    .notification-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .notification-item {
+      background: #fff;
+      border: 1px solid #ddd;
+      margin-bottom: 10px;
+      padding: 10px 15px;
+      border-radius: 4px;
+    }
+    .notification-item strong {
+      display: block;
+      margin-bottom: 5px;
+    }
+    .notification-item small {
+      color: #777;
+      font-size: 0.8rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Sidebar (White Background) -->
+    <aside class="sidebar">
+      <div class="profile-section">
+        {% if user.profile_pic %}
+          <img src="{{ url_for('static', filename='profile_pics/' ~ user.profile_pic) }}" alt="Profile Picture">
+        {% elif user.profile_pic_url %}
+          <img src="{{ user.profile_pic_url }}" alt="Default Profile Picture">
+        {% else %}
+          <img src="https://files.catbox.moe/1nq0v5.png" alt="Default Profile Picture">
+        {% endif %}
+        <h3>{{ user.username }}</h3>
+        {% if user.country and user.country_flag %}
+          <p>{{ user.country }} {{ user.country_flag }}</p>
+        {% endif %}
+      </div>
+      <nav>
+        <a href="{{ url_for('dashboard') }}">Dashboard Home</a>
+        <a href="{{ url_for('trade') }}">Trade</a>
+        <a href="{{ url_for('staking_route') }}">Staking</a>
+        <a href="{{ url_for('my_stakes') }}">My Stakes</a>
+        <a href="{{ url_for('settings') }}">Settings</a>
+        <a href="{{ url_for('notifications') }}">Notifications</a>
+        <a href="{{ url_for('chat_advisors') }}">Chat</a>
+        <a href="{{ url_for('transfer') }}">Transfer</a>
+        <a href="{{ url_for('news_feed') }}">News Feed</a>
+        <a href="{{ url_for('live_market') }}">Live Market</a>
+        <a href="{{ url_for('mining') }}">Mining</a>
+        <a href="{{ url_for('rewards_bonus') }}">Rewards & Bonus Stage</a>
+        <a href="{{ url_for('logout') }}">Logout</a>
+      </nav>
+    </aside>
+
+    <!-- Main Content: Notification Page -->
+    <div class="main-content">
+      <!-- Header Container with Notification Title & Logout Button -->
+      <div class="notification-header">
+        <h2>Notification</h2>
+        <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+      </div>
+      <!-- Notifications List -->
+      <div class="notifications-container">
+        <ul class="notification-list">
+          {% if notifications %}
+            {% for notification in notifications %}
+              <li class="notification-item">
+                <strong>{{ notification.sender }}</strong>
+                <span>{{ notification.message }}</span>
+                <br>
+                <small>{{ notification.timestamp }}</small>
+              </li>
+            {% endfor %}
+          {% else %}
+            <li class="notification-item">No new notifications.</li>
+          {% endif %}
+        </ul>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Voice Call</title>
+  <style>
+    body { margin: 0; font-family: Arial, sans-serif; background: #222; color: #fff; display: flex; align-items: center; justify-content: center; height: 100vh; }
+    .call-container { text-align: center; }
+    .profile-pic { width: 120px; height: 120px; border-radius: 50%; border: 4px solid #007bff; margin-bottom: 20px; }
+    .status { margin-bottom: 20px; font-size: 20px; }
+    .controls { background: #333; padding: 15px; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+    .controls button { background: #007bff; border: none; padding: 10px 15px; margin: 0 10px; color: #fff; border-radius: 4px; cursor: pointer; }
+    .controls button:hover { background: #0056b3; }
+    .options { margin-top: 10px; }
+    .options select { padding: 8px; border-radius: 4px; }
+    .back-link { margin-top: 20px; display: inline-block; color: #007bff; text-decoration: none; }
+  </style>
+  <script src="https://cdn.socket.io/4.4.1/socket.io.min.js"></script>
+  <script>
+    const socket = io();
+    const room = "voice_{{ advisor.id }}_{{ session['user_id'] }}"; // Unique room
+    socket.emit('join', { room: room });
+    // Example: Listen for incoming call signal
+    socket.on('incoming_call', function(data) {
+      document.getElementById('status').textContent = "Incoming Call...";
+    });
+    // Example: Trigger voice note sending
+    function sendVoiceNote() {
+      // In production, you would record audio using Web Audio API and send it as a blob
+      const dummyVoiceURL = "https://example.com/dummy_voice_note.mp3";
+      socket.emit('voice_note', { target: room, voice_url: dummyVoiceURL });
+      alert("Voice note sent!");
+    }
+    // Example: End call action
+    function endCall() {
+      alert("Call ended.");
+      window.location.href = "{{ url_for('dashboard') }}";
+    }
+  </script>
+</head>
+<body>
+  <div class="call-container">
+    <img class="profile-pic" src="{{ url_for('static', filename='profile_pics/' + advisor.profile_pic) }}" alt="Advisor">
+    <h2>Calling {{ advisor.username }}</h2>
+    <div id="status" class="status">Calling...</div>
+    <div class="controls">
+      <button onclick="sendVoiceNote()">Record Voice Note</button>
+      <button onclick="endCall()">End Call</button>
+    </div>
+    <div class="options">
+      <select>
+        <option value="call_back">Call Me Back</option>
+        <option value="urgent">It's Urgent</option>
+        <option value="check_in">How are you?</option>
+        <option value="info">Need More Info</option>
+      </select>
+    </div>
+    <a class="back-link" href="{{ url_for('dashboard') }}">Back to Dashboard</a>
+  </div>
+</body>
+</html>

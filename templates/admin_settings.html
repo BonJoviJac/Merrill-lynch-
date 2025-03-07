@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Admin Settings</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      padding: 20px;
+    }
+    .container {
+      max-width: 500px;
+      margin: auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    h2 {
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+      text-align: left;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 15px;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    .delete-btn {
+      background: #dc3545;
+      margin-top: 10px;
+    }
+    .back-link {
+      margin-top: 20px;
+      display: block;
+      text-decoration: none;
+      color: #007bff;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Admin Settings</h2>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <p style="color: {% if category=='danger' %}red{% else %}green{% endif %};">{{ message }}</p>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+    <form method="POST" enctype="multipart/form-data">
+      <label for="username">Username:</label>
+      <input type="text" name="username" value="{{ admin.username }}" required>
+      
+      <label for="email">Email Address:</label>
+      <input type="email" name="email" value="{{ admin.email }}" required>
+      
+      <label for="password">New Password:</label>
+      <input type="password" name="password">
+      
+      <label for="confirm_password">Confirm New Password:</label>
+      <input type="password" name="confirm_password">
+      
+      <label for="profile_pic">Profile Picture:</label>
+      <input type="file" name="profile_pic">
+      
+      <button type="submit">Update Settings</button>
+    </form>
+    <form method="POST" action="{{ url_for('delete_account') }}">
+      <button type="submit" class="delete-btn">Delete Account</button>
+    </form>
+    <a class="back-link" href="{{ url_for('admin_dashboard') }}">Back to Dashboard</a>
+  </div>
+</body>
+</html>

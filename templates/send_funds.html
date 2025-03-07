@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Admin - Send Funds</title>
+  <style>
+    body {
+      background: #ffffff;
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    .container {
+      background: #f9f9f9;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      max-width: 500px;
+      margin: 40px auto;
+      padding: 30px;
+    }
+    h2 { text-align: center; }
+    label { display: block; margin-top: 10px; }
+    select, input { width: 100%; padding: 10px; margin-top: 5px; border-radius: 4px; border: 1px solid #ccc; }
+    button {
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 20px;
+      width: 100%;
+    }
+    button:hover { background: #0056b3; }
+    .link { text-align: center; margin-top: 20px; }
+    .link a { color: #007bff; text-decoration: none; }
+    .link a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Send Funds to User</h2>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <p style="color: {% if category == 'danger' %}red{% else %}green{% endif %};">{{ message }}</p>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+    <form action="{{ url_for('send_funds') }}" method="POST">
+      <label for="user_id">Select User:</label>
+      <select name="user_id" required>
+        {% for user in users %}
+          <option value="{{ user.id }}">{{ user.username }} ({{ user.email }})</option>
+        {% endfor %}
+      </select>
+
+      <label for="crypto_name">Select Cryptocurrency:</label>
+      <select name="crypto_name" required>
+        {% for crypto in crypto_list %}
+          <option value="{{ crypto }}">{{ crypto }}</option>
+        {% endfor %}
+      </select>
+
+      <label for="amount">Amount:</label>
+      <input type="number" name="amount" step="0.0001" min="0" required>
+
+      <button type="submit">Send Funds</button>
+    </form>
+    <div class="link">
+      <a href="{{ url_for('admin_dashboard') }}">Back to Dashboard</a>
+    </div>
+  </div>
+</body>
+</html>

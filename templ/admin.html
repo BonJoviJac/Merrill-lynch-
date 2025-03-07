@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #001F3F; color: white; padding: 20px; }
+        .container { max-width: 400px; margin: auto; padding: 20px; background: #004080; border-radius: 10px; }
+        h2 { text-align: center; }
+        input, select { width: 100%; padding: 10px; margin: 10px 0; border-radius: 5px; border: none; }
+        .btn { background: green; color: white; padding: 10px; text-align: center; border-radius: 5px; cursor: pointer; }
+        .btn:hover { background: darkgreen; }
+        .flash { background: white; color: black; padding: 10px; margin: 10px 0; border-radius: 5px; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Fund User Wallet</h2>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST">
+    <input type="text" name="username" placeholder="Enter Username" required>
+    <input type="number" step="0.00000001" name="amount" placeholder="Enter Amount" required>
+    
+    <select name="crypto_type">
+        <option value="USD">Main Balance (USD)</option>
+        <option value="BTC">Bitcoin (BTC)</option>
+        <option value="ETH">Ethereum (ETH)</option>
+        <option value="DOGE">Dogecoin (DOGE)</option>
+        <option value="BNB">Binance Coin (BNB)</option>
+        <option value="TRON">Tron (TRX)</option>
+        <option value="SOLANA">Solana (SOL)</option>
+        <option value="LTC">Litecoin (LTC)</option>
+        <option value="USDT">Tether (USDT)</option>
+    </select>
+
+    <button type="submit">Fund User</button>
+</form>
+    </div>
+
+</body>
+</html>

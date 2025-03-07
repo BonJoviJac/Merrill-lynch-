@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Trade - Open Trades</title>
+  <style>
+    /* Global Reset & Base Styles */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background: #f4f4f4; color: #333; }
+    
+    /* Dashboard Container */
+    .dashboard-container { display: flex; min-height: 100vh; }
+    
+    /* Sidebar (matches dashboard sidebar) */
+    .sidebar {
+      width: 240px;
+      background: #fff;
+      border-right: 1px solid #ccc;
+      padding: 20px;
+    }
+    .sidebar .profile-section { text-align: center; margin-bottom: 30px; }
+    .sidebar .profile-section img {
+      width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin-bottom: 10px;
+    }
+    .sidebar .profile-section h3 { font-size: 1.1rem; color: #333; }
+    .sidebar .profile-section p { font-size: 0.9rem; color: #555; }
+    .sidebar nav a {
+      display: block;
+      text-decoration: none;
+      color: #333;
+      padding: 10px 0;
+      border-bottom: 1px solid #eee;
+      font-size: 0.95rem;
+    }
+    .sidebar nav a:hover { background: #f2f2f2; }
+    
+    /* Main Content */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    /* Header: Black header with "Open Trades" centered and Logout on right */
+    .dashboard-header {
+      background: #000;
+      color: #fff;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .dashboard-header h1 {
+      font-size: 1.25rem;
+      text-align: center;
+      flex: 1;
+    }
+    .dashboard-header .logout-btn {
+      text-decoration: none;
+      font-size: 0.9rem;
+      padding: 6px 12px;
+      border: 1px solid #fff;
+      border-radius: 4px;
+      color: #fff;
+      white-space: nowrap;
+    }
+    .dashboard-header .logout-btn:hover { background: #fff; color: #000; }
+    
+    /* Message Container for info messages */
+    #messageContainer { margin: 10px 0; }
+    .message {
+      padding: 10px;
+      border-radius: 5px;
+      margin-bottom: 10px;
+      font-size: 0.95rem;
+    }
+    .message.success { background: #d4edda; color: #155724; }
+    .message.error { background: #f8d7da; color: #721c24; }
+    .message.info { background: #d1ecf1; color: #0c5460; }
+    
+    /* Content Area (after header) */
+    .content-area { padding: 20px; overflow-y: auto; flex: 1; }
+    
+    /* Forex & News Section */
+    .section { background: #fff; margin-bottom: 20px; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    .forex-news { display: flex; flex-wrap: wrap; gap: 20px; }
+    .forex-ticker { flex: 1; background: #1a1a1a; color: #ffcc00; padding: 10px; border-radius: 8px; }
+    .news-ticker { flex: 2; background: #333; color: #ffcc00; padding: 10px; border-radius: 8px; white-space: nowrap; overflow: hidden; }
+    .news-ticker div { display: inline-block; padding-right: 40px; animation: scrollNews 15s linear infinite; }
+    @keyframes scrollNews { from { transform: translateX(100%); } to { transform: translateX(-100%); } }
+    
+    /* Forex Chart */
+    .chart-container { height: 400px; }
+    
+    /* Crypto Tracker: Two Mini Charts with white/light theme */
+    .crypto-tracker { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; margin-bottom: 20px; }
+    .crypto-box {
+      width: 300px; border: 1px solid #ccc; padding: 10px;
+      background: #fff; color: #333; text-align: center; border-radius: 8px;
+    }
+    
+    /* Trade Execution Panel */
+    .trade-panel { display: flex; flex-wrap: wrap; gap: 20px; }
+    .trade-form-container, .market-data-container, .live-price-container {
+      flex: 1; min-width: 300px; background: #eef5fa; padding: 15px; border-radius: 8px;
+    }
+    .trade-form-container h3,
+    .market-data-container h3,
+    .live-price-container h3 { text-align: center; margin-bottom: 10px; }
+    .trade-tabs { display: flex; justify-content: center; gap: 10px; margin-bottom: 10px; }
+    .trade-tabs button {
+      padding: 10px 20px; border: none; border-radius: 4px; background: #ddd;
+      cursor: pointer; font-weight: bold; transition: background 0.2s;
+    }
+    .trade-tabs button.active, .trade-tabs button:hover { background: #2f9e44; color: #fff; }
+    .trade-form { display: none; flex-direction: column; gap: 10px; }
+    .trade-form.active { display: flex; }
+    .trade-form label { font-weight: bold; font-size: 0.9rem; }
+    .trade-form select, .trade-form input {
+      padding: 8px; font-size: 1rem; border: 1px solid #ccc; border-radius: 4px;
+    }
+    .trade-form button { padding: 10px; font-size: 1rem; border: none; border-radius: 4px; cursor: pointer; }
+    .buy-btn { background: #28a745; color: #fff; }
+    .sell-btn { background: #dc3545; color: #fff; }
+    .market-data-container { height: 250px; }
+    .live-price-container { height: 150px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+    .live-price-container #livePrice { font-size: 1.5rem; font-weight: bold; color: #28a745; }
+    
+    /* Trade Execution Details Container */
+    .execution-container { margin-top: 20px; padding: 15px; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    
+    /* Live Market Section */
+    .live-market { margin-top: 30px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .market-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+    .market-table th, .market-table td {
+      padding: 10px; text-align: center; border-bottom: 1px solid #ddd; font-size: 0.9rem;
+    }
+    .market-table th { background: #f8f8f8; }
+    .heatmap { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; }
+    .heatmap-box { padding: 15px; border-radius: 5px; font-weight: bold; color: #fff; text-align: center; transition: background-color 0.5s ease; }
+    
+    /* Footer (placed after main content) */
+    footer {
+      background-color: #111;
+      color: white;
+      padding: 20px 0;
+      width: 100%;
+      margin-top: 20px;
+    }
+    .footer-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+    }
+    .footer-container a { text-decoration: none; }
+    .social-media { display: flex; gap: 15px; margin-bottom: 10px; }
+    .social-media img { width: 30px; }
+    .company-info p, .terms-license a, .partner-with p, .copyright p {
+      font-size: 0.9rem;
+      color: #bbb;
+      margin: 5px 0;
+    }
+    .terms-license { text-align: center; margin-bottom: 10px; }
+    .terms-license a { margin-right: 20px; }
+    .partner-with { text-align: center; margin-bottom: 10px; }
+    .partner-with img { width: 100px; }
+  </style>
+</head>
+<body>
+  <div class="dashboard-container">
+    <!-- SIDEBAR (Same as dashboard) -->
+    <aside class="sidebar">
+      <div class="profile-section">
+        {% if user.profile_pic and user.profile_pic|trim %}
+          <img src="{{ url_for('static', filename='profile_pics/' ~ user.profile_pic) }}" alt="Profile Picture">
+        {% elif user.profile_pic_url and user.profile_pic_url|trim %}
+          <img src="{{ user.profile_pic_url }}" alt="Default Profile Picture">
+        {% else %}
+          <img src="https://files.catbox.moe/1nq0v5.png" alt="Default Profile Picture">
+        {% endif %}
+        <h3>{{ user.username }}</h3>
+        {% if user.country and user.country_flag %}
+          <p>{{ user.country }} {{ user.country_flag }}</p>
+        {% endif %}
+      </div>
+      <nav>
+        <a href="{{ url_for('dashboard') }}">Dashboard Home</a>
+        <a href="{{ url_for('trade') }}">Trade</a>
+        <a href="{{ url_for('staking_route') }}">Staking</a>
+        <a href="{{ url_for('my_stakes') }}">My Stakes</a>
+        <a href="{{ url_for('settings') }}">Settings</a>
+        <a href="{{ url_for('notifications') }}">Notifications</a>
+        <a href="{{ url_for('chat_advisors') }}">Chat <span id="dashboardChatBadge" style="display:none; background:red; color:white; border-radius:50%; padding:2px 6px; font-size:0.75rem;">New</span></a>
+        <a href="{{ url_for('transfer') }}">Transfer</a>
+        <a href="{{ url_for('news_feed') }}">News Feed</a>
+        <a href="{{ url_for('live_market') }}">Live Market</a>
+        <a href="{{ url_for('mining') }}">Mining</a>
+        <a href="{{ url_for('rewards_bonus') }}">Rewards & Bonus Stage</a>
+        <a href="{{ url_for('logout') }}">Logout</a>
+      </nav>
+    </aside>
+    
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+      <!-- HEADER: Black header with "Open Trades" in center and Logout on right -->
+      <div class="dashboard-header">
+        <h1 style="text-align:center; flex:1;">Open Trades</h1>
+        <a class="logout-btn" href="{{ url_for('logout') }}">Logout</a>
+      </div>
+      
+      <!-- Message Container -->
+      <div id="messageContainer"></div>
+      
+      <!-- CONTENT AREA -->
+      <div class="content-area">
+        <!-- Forex & News Section -->
+        <section class="section forex-news">
+          <div class="forex-ticker">
+            <h2>Forex Quotes</h2>
+            <div id="forexTicker">[Forex Ticker Widget]</div>
+          </div>
+          <div class="news-ticker" id="forexNews">
+            <div><a href="#" style="color: #ffcc00;">EUR/USD up 0.1%</a></div>
+            <div><a href="#" style="color: #ffcc00;">USD/JPY down 0.2%</a></div>
+            <div><a href="#" style="color: #ffcc00;">GBP/USD stable</a></div>
+          </div>
+        </section>
+        
+        <!-- Forex Chart Section -->
+        <section class="section">
+          <h2>Forex Chart</h2>
+          <div class="chart-container" id="forexChart">
+            <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+            <script type="text/javascript">
+              new TradingView.widget({
+                "container_id": "forexChart",
+                "width": "100%",
+                "height": "400",
+                "symbol": "FX:EURUSD",
+                "interval": "1",
+                "timezone": "Etc/UTC",
+                "theme": "dark",
+                "style": "1",
+                "locale": "en",
+                "toolbar_bg": "#f1f3f6",
+                "enable_publishing": false,
+                "allow_symbol_change": true
+              });
+            </script>
+          </div>
+        </section>
+        
+        <!-- Crypto Tracker Section (Light theme) -->
+        <section class="section">
+          <h2>Crypto Tracker</h2>
+          <div class="crypto-tracker">
+            <div class="crypto-box">
+              <div class="tradingview-widget-container">
+                <div class="tradingview-widget-container__widget"></div>
+                <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
+                {
+                  "symbol": "BINANCE:BTCUSDT",
+                  "width": 300,
+                  "height": 200,
+                  "locale": "en",
+                  "dateRange": "1D",
+                  "colorTheme": "light",
+                  "trendLineColor": "#000",
+                  "underLineColor": "rgba(0,0,0,0.1)",
+                  "isTransparent": false
+                }
+                </script>
+              </div>
+            </div>
+            <div class="crypto-box">
+              <div class="tradingview-widget-container">
+                <div class="tradingview-widget-container__widget"></div>
+                <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
+                {
+                  "symbol": "BINANCE:ETHUSDT",
+                  "width": 300,
+                  "height": 200,
+                  "locale": "en",
+                  "dateRange": "1D",
+                  "colorTheme": "light",
+                  "trendLineColor": "#000",
+                  "underLineColor": "rgba(0,0,0,0.1)",
+                  "isTransparent": false
+                }
+                </script>
+              </div>
+            </div>
+          </div>
+        </section>
+        
+        <!-- Trade Execution Panel (Tabbed Buy/Sell) -->
+        <section class="section">
+          <div class="trade-panel">
+            <!-- Order Form Container -->
+            <div class="trade-form-container">
+              <div class="trade-tabs">
+                <button id="buyTab" onclick="showTradeForm('buy')" class="active">Buy</button>
+                <button id="sellTab" onclick="showTradeForm('sell')">Sell</button>
+              </div>
+              <form id="buyForm" class="trade-form active" onsubmit="executeTrade(event, 'buy')">
+                <input type="hidden" name="trade_type" value="buy">
+                <label>Crypto:</label>
+                <select name="crypto_name" id="buyCrypto" required>
+                  {% for crypto, price in crypto_prices.items() %}
+                    <option value="{{ crypto }}">{{ crypto }} (${{ price }})</option>
+                  {% endfor %}
+                </select>
+                <label>Quantity:</label>
+                <input type="number" name="quantity" id="buyQuantity" step="0.0001" required>
+                <label>Leverage:</label>
+                <select name="leverage" id="buyLeverage" required>
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                  <option value="5">5</option>
+                  <option value="10">10</option>
+                  <option value="20">20</option>
+                </select>
+                <button type="submit" class="buy-btn">Buy</button>
+              </form>
+              <form id="sellForm" class="trade-form" onsubmit="executeTrade(event, 'sell')" style="display:none;">
+                <input type="hidden" name="trade_type" value="sell">
+                <label>Crypto:</label>
+                <select name="crypto_name" id="sellCrypto" required>
+                  {% for crypto, price in crypto_prices.items() %}
+                    <option value="{{ crypto }}">{{ crypto }} (${{ price }})</option>
+                  {% endfor %}
+                </select>
+                <label>Quantity:</label>
+                <input type="number" name="quantity" id="sellQuantity" step="0.0001" required>
+                <label>Leverage:</label>
+                <select name="leverage" id="sellLeverage" required>
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                  <option value="5">5</option>
+                  <option value="10">10</option>
+                  <option value="20">20</option>
+                </select>
+                <button type="submit" class="sell-btn">Sell</button>
+              </form>
+            </div>
+            <!-- Market Data Widget (without header text) -->
+            <div class="market-data-container">
+              <div id="tradingview_market_quotes" class="tradingview-widget-container"></div>
+              <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-market-quotes.js" async>
+                {
+                  "title_raw": "",
+                  "symbolsGroups": [
+                    {
+                      "name": "",
+                      "originalName": "",
+                      "symbols": [
+                        { "name": "BINANCE:BTCUSDT", "displayName": "BTC/USDT" },
+                        { "name": "BINANCE:ETHUSDT", "displayName": "ETH/USDT" },
+                        { "name": "BINANCE:BNBUSDT", "displayName": "BNB/USDT" },
+                        { "name": "BINANCE:SOLUSDT", "displayName": "SOL/USDT" },
+                        { "name": "BINANCE:ADAUSDT", "displayName": "ADA/USDT" },
+                        { "name": "BINANCE:XRPUSDT", "displayName": "XRP/USDT" },
+                        { "name": "BINANCE:DOGEUSDT", "displayName": "DOGE/USDT" },
+                        { "name": "BINANCE:MATICUSDT", "displayName": "MATIC/USDT" }
+                      ]
+                    }
+                  ],
+                  "showSymbolLogo": true,
+                  "colorTheme": "light",
+                  "isTransparent": false,
+                  "locale": "en",
+                  "width": "100%",
+                  "height": "250"
+                }
+              </script>
+            </div>
+            <!-- Live Crypto Price Widget (no header text) -->
+            <div class="live-price-container">
+              <div id="livePrice">Loading price...</div>
+            </div>
+          </div>
+        </section>
+        
+        <!-- Trade Execution Details Container -->
+        <section class="section execution-container" id="executionContainer">
+          <!-- Execution messages will appear here -->
+        </section>
+        
+        <!-- Live Market Section -->
+        <section class="section live-market">
+          <table class="market-table" id="marketTable">
+            <thead>
+              <tr>
+                <th>Coin</th>
+                <th>Bid</th>
+                <th>Ask</th>
+                <th>Change</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+          <div class="heatmap" id="heatmapGrid"></div>
+        </section>
+        
+        <!-- Back to Dashboard Link -->
+        <div style="text-align: center; margin-top: 20px;">
+          <a href="{{ url_for('dashboard') }}">Back to Dashboard</a>
+        </div>
+      </div>
+    </div>
+    
+    <!-- FOOTER: Placed after main content (not below sidebar) -->
+    <footer>
+      <div class="footer-container">
+        <div class="social-media">
+          <a href="https://facebook.com" target="_blank"><img src="https://files.catbox.moe/sbm1q6.png" alt="Facebook"></a>
+          <a href="https://instagram.com" target="_blank"><img src="https://files.catbox.moe/tr50zg.png" alt="Instagram"></a>
+          <a href="https://twitter.com" target="_blank"><img src="https://files.catbox.moe/l3qz5f.png" alt="Twitter"></a>
+          <a href="https://telegram.org" target="_blank"><img src="https://files.catbox.moe/8fmms9.png" alt="Telegram"></a>
+          <a href="https://discord.com" target="_blank"><img src="https://files.catbox.moe/865025.png" alt="Discord"></a>
+        </div>
+        <div class="company-info">
+          <p>
+            Bank of America Merrill Lynch® is a premier global financial institution dedicated to delivering world-class financial solutions.
+          </p>
+        </div>
+        <div class="terms-license">
+          <a href="/terms" style="color: #bbb;">Terms & Conditions</a>
+          <a href="/privacy" style="color: #bbb; margin: 0 20px;">Privacy Policy</a>
+          <a href="/license" style="color: #bbb;">
+            <img src="https://files.catbox.moe/fef885.png" alt="License" style="width: 15px; vertical-align: middle; margin-right: 5px;">
+            Insured & Trusted
+          </a>
+        </div>
+        <div class="partner-with">
+          <p>Proudly partnered with</p>
+          <img src="https://files.catbox.moe/epntm4.png" alt="Partner">
+        </div>
+        <div class="copyright">
+          <p>&copy; 2025 Bank of America Merrill Lynch. All rights reserved.</p>
+        </div>
+      </div>
+    </footer>
+  </div>
+  
+  <!-- JavaScript for trade functionality and live market updates -->
+  <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+  <script>
+    // Simulated user balance (from template)
+    var userBalance = parseFloat(document.getElementById("userBalance").innerText);
+    
+    // Function to display messages
+    function showMessage(type, text) {
+      var msgDiv = document.createElement("div");
+      msgDiv.className = "message " + type;
+      msgDiv.innerText = text;
+      var container = document.getElementById("messageContainer");
+      container.appendChild(msgDiv);
+      setTimeout(function(){ container.removeChild(msgDiv); }, 3000);
+    }
+    
+    // Execute trade (buy or sell)
+    function executeTrade(event, type) {
+      event.preventDefault();
+      var crypto, quantity, leverage;
+      if (type === "buy") {
+        crypto = document.getElementById("buyCrypto").value;
+        quantity = parseFloat(document.getElementById("buyQuantity").value);
+        leverage = parseFloat(document.getElementById("buyLeverage").value);
+      } else {
+        crypto = document.getElementById("sellCrypto").value;
+        quantity = parseFloat(document.getElementById("sellQuantity").value);
+        leverage = parseFloat(document.getElementById("sellLeverage").value);
+      }
+      // Use base prices for simulation
+      var basePrices = { "Bitcoin (BTC)": 83740, "Ethereum (ETH)": 4200, "Tether (USDT)": 1.00 };
+      var basePrice = basePrices[crypto] || 100;
+      var orderCost = quantity * basePrice;
+      if (type === "buy" && orderCost > userBalance) {
+        showMessage("error", "Insufficient balance for buy order.");
+        return;
+      }
+      if (type === "buy") {
+        userBalance -= orderCost;
+      } else {
+        var profitLoss = orderCost * ((Math.random() * 10 - 5) / 100);
+        userBalance += orderCost + profitLoss;
+      }
+      document.getElementById("userBalance").innerText = userBalance.toFixed(2);
+      
+      // Build and display execution message
+      var execMsg = document.createElement("div");
+      execMsg.style.marginBottom = "10px";
+      execMsg.style.padding = "10px";
+      execMsg.style.border = "1px solid #ccc";
+      execMsg.style.borderRadius = "5px";
+      execMsg.style.background = "#f8f8f8";
+      if (type === "buy") {
+        execMsg.innerHTML = "Buy Order: " + quantity + " of " + crypto + " at $" + basePrice.toFixed(2) + " executed.";
+      } else {
+        var profitLoss = orderCost * ((Math.random() * 10 - 5) / 100);
+        var plText = profitLoss >= 0 ? "Profit: $" + profitLoss.toFixed(2) : "Loss: $" + Math.abs(profitLoss).toFixed(2);
+        execMsg.innerHTML = "Sell Order: " + quantity + " of " + crypto + " at $" + basePrice.toFixed(2) + " executed. " + plText;
+      }
+      document.getElementById("executionContainer").appendChild(execMsg);
+      showMessage("success", type.charAt(0).toUpperCase() + type.slice(1) + " order executed successfully.");
+    }
+    
+    // Trade form tab switcher
+    function showTradeForm(type) {
+      if(type === 'buy') {
+        document.getElementById('buyForm').style.display = 'flex';
+        document.getElementById('sellForm').style.display = 'none';
+        document.getElementById('buyTab').classList.add('active');
+        document.getElementById('sellTab').classList.remove('active');
+      } else {
+        document.getElementById('buyForm').style.display = 'none';
+        document.getElementById('sellForm').style.display = 'flex';
+        document.getElementById('sellTab').classList.add('active');
+        document.getElementById('buyTab').classList.remove('active');
+      }
+    }
+    showTradeForm('buy');
+    
+    // Simulate live market data update
+    function updateMarketData() {
+      var marketData = [
+        { coin: "BTC", bid: (83740 * (1 - Math.random() * 0.005)).toFixed(2), ask: (83740 * (1 + Math.random() * 0.005)).toFixed(2), change: (Math.random() * 2 - 1).toFixed(2) },
+        { coin: "ETH", bid: (4200 * (1 - Math.random() * 0.005)).toFixed(2), ask: (4200 * (1 + Math.random() * 0.005)).toFixed(2), change: (Math.random() * 2 - 1).toFixed(2) },
+        { coin: "USDT", bid: (1.00 * (1 - Math.random() * 0.001)).toFixed(2), ask: (1.00 * (1 + Math.random() * 0.001)).toFixed(2), change: (Math.random() * 0.2 - 0.1).toFixed(2) }
+      ];
+      var tbody = document.getElementById('marketTable').getElementsByTagName('tbody')[0];
+      tbody.innerHTML = "";
+      marketData.forEach(function(item) {
+        var row = "<tr>" +
+                    "<td>" + item.coin + "</td>" +
+                    "<td>$" + item.bid + "</td>" +
+                    "<td>$" + item.ask + "</td>" +
+                    "<td>" + item.change + "%</td>" +
+                  "</tr>";
+        tbody.innerHTML += row;
+      });
+    }
+    
+    // Simulate heatmap updates
+    function updateHeatmap() {
+      var coins = ["BTC", "ETH", "BNB", "XRP", "ADA", "SOL", "DOGE", "DOT", "MATIC", "LTC"];
+      var heatmapGrid = document.getElementById('heatmapGrid');
+      heatmapGrid.innerHTML = "";
+      coins.forEach(function(coin) {
+        var priceChange = (Math.random() * 2 - 1).toFixed(2);
+        var color = priceChange >= 0 ? "rgb(0, " + Math.min(255, 100 + priceChange * 80) + ", 0)" 
+                                     : "rgb(" + Math.min(255, 100 + Math.abs(priceChange) * 80) + ", 0, 0)";
+        heatmapGrid.innerHTML += "<div class='heatmap-box' style='background:" + color + ";'>" + coin + " " + priceChange + "%</div>";
+      });
+    }
+    
+    updateMarketData();
+    updateHeatmap();
+    setInterval(updateMarketData, 2000);
+    setInterval(updateHeatmap, 2000);
+    
+    // SocketIO for live crypto price updates
+    var socket = io();
+    socket.on('price_update', function(data) {
+      if(data.crypto === 'Bitcoin (BTC)') {
+        document.getElementById('livePrice').innerText = "$" + data.price;
+      }
+    });
+  </script>
+</body>
+</html>

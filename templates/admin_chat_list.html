@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Admin Chat List</title>
+  <!-- FontAwesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <style>
+    body {
+      background-color: #f8f9fa;
+      font-family: Arial, sans-serif;
+      overflow: hidden; /* disable scrolling during loader */
+    }
+    /* Loader Overlay and Spinner */
+    .loader-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+    .spinner {
+      border: 8px solid #f3f3f3;
+      border-top: 8px solid #3498db;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    /* Main Container (hidden until loader finishes) */
+    .container {
+      max-width: 600px;
+      margin: 20px auto;
+      padding: 10px;
+      display: none;
+    }
+    h3 {
+      margin-bottom: 20px;
+    }
+    .alert {
+      padding: 10px 15px;
+      border-radius: 4px;
+      margin-bottom: 15px;
+    }
+    .alert-danger {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+    .list-group {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+    }
+    .list-group-item {
+      display: flex;
+      align-items: center;
+      padding: 10px;
+      border: 1px solid #ddd;
+      margin-bottom: 10px;
+      border-radius: 8px;
+      text-decoration: none;
+      color: #333;
+      background-color: #fff;
+      transition: background-color 0.2s ease;
+    }
+    .list-group-item:hover {
+      background-color: #e9ecef;
+    }
+    .list-group-item img {
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      object-fit: cover;
+      margin-right: 15px;
+    }
+    .list-group-item h5 {
+      margin: 0;
+      font-size: 1.1rem;
+    }
+    /* Notification Badge */
+    #chatNotificationBadge {
+      display: none;
+      background: red;
+      color: white;
+      border-radius: 50%;
+      padding: 2px 6px;
+      font-size: 0.75rem;
+    }
+  </style>
+</head>
+<body>
+  <!-- Loader Overlay -->
+  <div class="loader-overlay" id="loader">
+    <div class="spinner"></div>
+  </div>
+  
+  <!-- Main Content -->
+  <div class="container" id="mainContent">
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+    
+    <h3>
+      Chats 
+      <span id="chatNotificationBadge">New</span>
+    </h3>
+    <ul class="list-group">
+      {% for user in users %}
+      <li>
+        <a href="{{ url_for('admin_chat', user_id=user.id) }}" class="list-group-item">
+          <img src="{{ url_for('static', filename='profile_pics/' ~ user.profile_pic) }}" alt="Profile Picture">
+          <div>
+            <h5>{{ user.username }}</h5>
+          </div>
+        </a>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+  
+  <!-- Socket.IO Client Script -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.min.js"></script>
+  <script>
+    // Establish Socket.IO connection and listen for notifications
+    var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
+    socket.on('new_chat_notification', function(data) {
+      var badge = document.getElementById('chatNotificationBadge');
+      badge.style.display = 'inline-block';
+      badge.innerText = 'New';
+    });
+    
+    // Hide loader and show main content after 2 seconds
+    setTimeout(function(){
+      document.getElementById('loader').style.display = 'none';
+      document.getElementById('mainContent').style.display = 'block';
+      document.body.style.overflow = 'auto';
+    }, 2000);
+  </script>
+</body>
+</html>

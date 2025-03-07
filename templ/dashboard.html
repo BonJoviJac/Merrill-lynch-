@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <style>
+        /* General Page Styles */
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 0;
+            padding-top: 10px; /* Prevent content from being hidden under fixed header */
+            background-color: #001F3F; /* Deep blue background */
+            color: white;
+        }
+
+        /* Header Styles */
+        .header {
+            background-color: #004080; /* Semi-light blue */
+            padding: 13px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            box-sizing: border-box;
+            z-index: 1000;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 9px;
+            white-space: nowrap;
+        }
+
+        .logo-container {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .logo-container img {
+            height: 90px; /* Smaller size for mobile */
+            filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.8)); /* Glowing effect */
+            transition: 0.3s ease-in-out;
+        }
+
+        .logo-container img:hover {
+            filter: drop-shadow(0 0 12px rgba(255, 255, 255, 1));
+        }
+
+        .balance-container {
+            background-color: white;
+            color: #001F3F;
+            padding: 8px 9px;
+            border-radius: 5px;
+            font-size: 12px;
+            font-weight: bold;
+            min-width: 20px;
+            text-align: center;
+        }
+
+        /* Main Content */
+        .container {
+            width: 90%;
+            max-width: 400px;
+            margin: auto;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .logout {
+            display: block;
+            margin-top: 20px;
+            text-decoration: none;
+            color: white;
+            font-weight: bold;
+            padding: 10px;
+        }
+        
+        
+        /* Balance Box */
+        .balance-box {
+            background: linear-gradient(135deg, #4A90E2, #1E3A8A); /* Sleek light blue */
+            padding: 20px;
+            border-radius: 15px;
+            margin: 80px auto 20px;
+            width: 90%;
+            max-width: 400px;
+            position: relative;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .balance-box h2 {
+            font-size: 16px;
+            opacity: 2.8;
+            position: absolute;
+            left: 15px;
+            top: 5px;
+        }
+
+        .crypto-dropdown {
+            background-color: #222;
+            padding: 15px;
+            margin-top: 55px;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .dropdown-container {
+            display: none;
+            background-color: #333;
+            margin-top: 10px;
+            border-radius: 10px;
+            padding: 10px;
+        }
+
+        .dropdown-container div {
+            padding: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            justify-content: space-between;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .dropdown-container div:last-child {
+            border-bottom: none;
+        }
+
+        /* White Funds Container */
+        .funds-container {
+            background: white;
+            color: black;
+            border-radius: 15px 15px 0 0;
+            padding: 15px;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .funds-container h3 {
+            font-size: 14px;
+            opacity: 0.7;
+        }
+
+        .funds-container p {
+            font-size: 24px;
+            font-weight: bold;
+            color: #222;
+        }
+
+        .btn-container {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .btn {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn:first-child {
+            color: green;
+        }
+
+        .btn:last-child {
+            color: red;
+        }
+                
+        /* Message Container */
+        .message-container {
+            background: rgba(255, 255, 255, 0.15); /* Lighter transparency */
+            padding: 25px;
+            border-radius: 20px; /* Softer curves */
+            margin: 90px auto 20px;
+            width: 90%;
+            max-width: 490px;
+            box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        .message-container h2 {
+            font-size: 18px;
+            margin-bottom: 12px;
+        }
+
+        .divider {
+            border-bottom: 2px solid rgba(255, 255, 255, 0.4);
+            margin: 18px 0;
+        }
+
+        .inspiration-text {
+            font-size: 17px;
+            opacity: 0.95;
+            transition: opacity 0.5s ease-in-out;
+        }
+        
+        /* Tracker Container */
+        .tracker-container {
+            background: rgba(255, 255, 255, 0.18); /* Light transparency */
+            padding: 20px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0px 4px 10px rgba(255, 255, 255, 0.15);
+            text-align: center;
+        }
+
+        .tracker-container h2 {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: white;
+            opacity: 0.9;
+        }
+
+        .divider {
+            border-bottom: 2px solid rgba(255, 255, 255, 0.4);
+            margin: 15px 0;
+        }
+
+        /* TradingView Widgets */
+        .tradingview-widget-container {
+            margin: 8px 0;
+        }
+        
+        /* Crypto Market Size Container */
+        .crypto-market-container {
+            width: 90%;
+            max-width: 900px;
+            height: 500px;
+            background: rgba(255, 255, 255, 0.9); /* Light transparency */
+            border-radius: 15px; /* Curved edges */
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .crypto-market-container h2 {
+            margin-top: 0;
+            font-size: 20px;
+            color: #333;
+        }
+
+        /* Embedded Iframe Styling */
+        .crypto-bubbles-iframe {
+            width: 100%;
+            height: 90%;
+            border: none;
+            border-radius: 10px;
+        }
+                
+        /* Crypto Market Map Container */
+        .crypto-market-container {
+            width: 90%;
+            max-width: 1000px;
+            height: 550px;
+            background: rgba(255, 255, 255, 0.9); /* Light transparency */
+            border-radius: 15px; /* Curved edges */
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .crypto-market-container h2 {
+            margin-top: 0;
+            font-size: 20px;
+            color: #333;
+        }
+
+        /* Embedded Iframe Styling */
+        .crypto-map-iframe {
+            width: 100%;
+            height: 90%;
+            border: none;
+            border-radius: 10px;
+        }
+        
+        
+        /* Fixed Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: white;
+            box-shadow: 0px -2px 10px rgba(0, 0, 0, 0.2);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 12px 0;
+            border-radius: 15px 15px 0 0;
+            z-index: 1000;
+        }
+
+        /* Navigation Button Styles */
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: #333;
+            font-size: 12px;
+            font-weight: bold;
+            transition: 0.3s ease;
+        }
+
+        .nav-item img {
+            width: 30px;
+            height: 30px;
+            margin-bottom: 4px;
+            filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.1));
+            transition: transform 0.2s ease;
+        }
+
+        .nav-item:hover img {
+            transform: scale(1.1);
+        }
+
+        .nav-item:hover {
+            color: #007BFF;
+        }
+        
+    </style>
+</head>
+<body>
+
+    <!-- Header (Fixed) -->
+    <div class="header">
+        <h1>{{ username }}</h1>
+        <div class="logo-container">
+            <a href="#"><img src="https://files.catbox.moe/l9d8yj.png" alt="Logo"></a>
+        </div>
+        <div class="balance-container">
+            Balance: ${{ "%.4f"|format(balance) }}
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <a href="{{ url_for('logout') }}" class="logout">Logout</a>
+    </div>
+    
+
+
+    <div class="balance-box">
+        <h2>Total Balance<br><span style="opacity: 0.7;">Available for use</span></h2>
+
+        <div class="crypto-dropdown" onclick="toggleDropdown()">
+            <span id="selected-crypto">BTC</span>
+            <span id="selected-balance">${{ "%.6f"|format(crypto_balances['BTC']) }}</span>
+        </div>
+
+        <div class="dropdown-container" id="crypto-dropdown">
+            <div onclick="selectCrypto('BTC', {{ crypto_balances['BTC'] }}, 6)"><span>BTC</span></div>
+            <div onclick="selectCrypto('ETH', {{ crypto_balances['ETH'] }}, 6)"><span>ETH</span></div>
+            <div onclick="selectCrypto('DOGE', {{ crypto_balances['DOGE'] }}, 2)"><span>DOGE</span></div>
+            <div onclick="selectCrypto('BNB', {{ crypto_balances['BNB'] }}, 6)"><span>BNB</span></div>
+            <div onclick="selectCrypto('TRON', {{ crypto_balances['TRON'] }}, 2)"><span>TRON</span></div>
+            <div onclick="selectCrypto('SOLANA', {{ crypto_balances['SOLANA'] }}, 2)"><span>SOLANA</span></div>
+            <div onclick="selectCrypto('LTC', {{ crypto_balances['LTC'] }}, 6)"><span>LTC</span></div>
+            <div onclick="selectCrypto('USDT', {{ crypto_balances['USDT'] }}, 2)"><span>USDT</span></div>
+        </div>
+
+        <div class="funds-container">
+            <h3>Available Funds in USD</h3>
+            <p id="funds-balance">${{ "%.4f"|format(balance) }}</p>
+            <div class="btn-container">
+                <a href="/deposit" class="btn">Deposit</a>
+                <a href="/withdraw" class="btn">Withdraw</a>
+            </div>
+        </div>
+    </div>
+    
+    
+    <!-- Welcome & Inspiration Message Container -->
+    <div class="message-container">
+        <h2>Welcome to Merrill Lynch Trading Platform</h2>
+        <p>At Merrill Lynch, we empower traders with knowledge, strategy, and the tools needed to succeed.  
+           Our platform is designed for precision, giving you access to a seamless trading experience.</p>
+        <p>Markets move fast—so should your decisions. Stay ahead with strategic insights, risk management,  
+           and a disciplined approach. Remember, wealth is built over time, not overnight.</p>
+        
+        <div class="divider"></div>
+
+        <!-- Rotating Inspiration Text -->
+        <p class="inspiration-text" id="inspiration-text">
+            Discipline is the bridge between goals and accomplishment. Plan your trades and trade your plan.
+        </p>
+    </div>
+    
+    
+    <div class="tracker-container">
+        <h2>Market Watch</h2>
+        
+        <div class="tradingview-widget-container">
+            <div class="tradingview-widget-container__widget"></div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Bitcoin (BTC/USD) -->
+        <div class="tradingview-widget-container">
+            <div class="tradingview-widget-container__widget"></div>
+            <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
+            {
+                "symbol": "BITSTAMP:BTCUSD",
+                "width": "100%",
+                "height": "100",
+                "locale": "en",
+                "dateRange": "1D",
+                "colorTheme": "light",
+                "isTransparent": true,
+                "autosize": true
+            }
+            </script>
+        </div>
+
+        <!-- EUR/USD -->
+        <div class="tradingview-widget-container">
+            <div class="tradingview-widget-container__widget"></div>
+            <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
+            {
+                "symbol": "FX:EURUSD",
+                "width": "100%",
+                "height": "100",
+                "locale": "en",
+                "dateRange": "1D",
+                "colorTheme": "light",
+                "isTransparent": true,
+                "autosize": true
+            }
+            </script>
+        </div>
+
+        <!-- Gold (XAU/USD) -->
+        <div class="tradingview-widget-container">
+            <div class="tradingview-widget-container__widget"></div>
+            <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
+            {
+                "symbol": "OANDA:XAUUSD",
+                "width": "100%",
+                "height": "100",
+                "locale": "en",
+                "dateRange": "1D",
+                "colorTheme": "light",
+                "isTransparent": true,
+                "autosize": true
+            }
+            </script>
+        </div>
+        
+        
+    <!-- Crypto Market Size Container -->
+    <div class="crypto-market-container">
+        <h2>Crypto Market Size Overview</h2>
+        <iframe class="crypto-bubbles-iframe" 
+            src="https://cryptobubbles.net/" 
+            loading="lazy">
+        </iframe>
+    </div>
+    
+    <!-- Crypto Market Map Container -->
+    <div class="crypto-market-container">
+        <h2>Crypto Market Heatmap</h2>
+        <iframe class="crypto-map-iframe" 
+            src="https://coin360.com/" 
+            loading="lazy">
+        </iframe>
+    </div>
+   </div>
+   
+    <!-- Bottom Fixed Navigation -->
+    <div class="bottom-nav">
+        <a href="{{ url_for('dashboard') }}" class="nav-item">
+            <img src="https://files.catbox.moe/9whhuc.gif" alt="Dashboard">
+            Dashboard
+        </a>
+        <a href="{{ url_for('live_market') }}" class="nav-item">
+            <img src="https://files.catbox.moe/kw3afi.gif" alt="Live Market">
+            Live Market
+        </a>
+        <a href="{{ url_for('open_trade') }}" class="nav-item">
+            <img src="https://files.catbox.moe/x1stgi.gif" alt="Open Trade">
+            Open Trade
+        </a>
+        <a href="{{ url_for('earn') }}" class="nav-item">
+            <img src="https://files.catbox.moe/pszpx9.gif" alt="Earn">
+            Earn
+        </a>
+        <a href="{{ url_for('chat_room') }}" class="nav-item">
+            <img src="https://files.catbox.moe/aseua6.gif" alt="Chat Room">
+            Chat Room
+        </a>
+        <a href="{{ url_for('profile') }}" class="nav-item">
+            <img src="https://files.catbox.moe/t6xkqw.gif" alt="Me">
+            Me
+        </a>
+        <a href="{{ url_for('settings') }}" class="nav-item">
+            <img src="https://files.catbox.moe/i1m7n4.gif" alt="Settings">
+            Settings
+        </a>
+    </div>
+    
+    <script>
+        function toggleDropdown() {
+            let dropdown = document.getElementById("crypto-dropdown");
+            dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
+        }
+
+        function selectCrypto(crypto, balance, decimals) {
+            document.getElementById("selected-crypto").innerText = crypto;
+            document.getElementById("selected-balance").innerText = `$${balance.toFixed(decimals)}`;
+            document.getElementById("crypto-dropdown").style.display = "none";
+        }
+        
+                const inspirationTexts = [
+            "Discipline is the bridge between goals and accomplishment. Plan your trades and trade your plan.",
+            "Patience in trading is not about waiting, but about preparing. The market rewards the well-prepared.",
+            "Risk management is your best trade. Protect your capital, and it will protect you.",
+            "Successful traders don’t predict markets; they react strategically to market movements.",
+            "Every trade is a lesson. Whether you win or lose, make sure you learn.",
+            "Consistency beats intensity. A well-executed strategy outperforms random luck.",
+            "The best traders control emotions before they control markets. Keep a calm mind.",
+            "Profit follows those who respect the market. Arrogance leads to losses.",
+            "A trader without a risk plan is a gambler. Define your exit strategy before entering a trade.",
+            "The only guarantee in trading is uncertainty. Adaptability is your greatest asset.",
+            "Short-term volatility is noise. Long-term trends create wealth.",
+            "Smart traders let profits run and cut losses early. Never do the opposite.",
+            "Success in trading is about mastering psychology, not chasing price.",
+            "Every downturn is an opportunity. The patient investor thrives where others panic.",
+            "Knowledge is the highest-paying investment. Learn, apply, and refine your strategy daily."
+        ];
+
+        let index = 0;
+
+        function changeInspirationText() {
+            index = (index + 1) % inspirationTexts.length;
+            const textElement = document.getElementById("inspiration-text");
+            textElement.style.opacity = 0; // Fade out effect
+            setTimeout(() => {
+                textElement.textContent = inspirationTexts[index];
+                textElement.style.opacity = 1; // Fade in effect
+            }, 500);
+        }
+
+        // Change text every 5 minutes (300,000 ms)
+        setInterval(changeInspirationText, 300000);
+    </script>
+
+</body>
+</html>

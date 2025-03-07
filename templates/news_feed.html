@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>News Feed</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <style>
+    body { margin: 0; font-family: Arial, sans-serif; background: #f4f4f4; }
+    .sidebar {
+      width: 220px;
+      background: #fff;
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      border-right: 1px solid #ddd;
+      padding: 20px;
+      overflow-y: auto;
+    }
+    .sidebar img.country-flag {
+      width: 40px;
+      height: auto;
+      display: block;
+      margin-bottom: 10px;
+    }
+    .sidebar .profile-section {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .sidebar .profile-section img {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      margin-bottom: 5px;
+    }
+    .sidebar nav a {
+      display: block;
+      padding: 10px;
+      color: #333;
+      text-decoration: none;
+      border-bottom: 1px solid #eee;
+    }
+    .sidebar nav a:hover {
+      background: #f0f0f0;
+    }
+    .header {
+      background: #000;
+      color: #fff;
+      padding: 15px 20px;
+      text-align: center;
+      position: fixed;
+      top: 0;
+      left: 220px;
+      right: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .header h1 {
+      margin: 0;
+      flex: 1;
+      text-align: center;
+      font-size: 24px;
+    }
+    .header .logout-btn {
+      background: transparent;
+      border: 2px solid #fff;
+      color: #fff;
+      padding: 5px 10px;
+      cursor: pointer;
+      border-radius: 4px;
+      text-decoration: none;
+    }
+    .main-content {
+      margin-top: 70px; /* header height */
+      margin-left: 220px; /* sidebar width */
+      padding: 20px;
+    }
+    /* Featured Update Section */
+    .featured-update {
+      background: #fff;
+      border: 1px solid #ddd;
+      padding: 20px;
+      border-radius: 4px;
+      margin-bottom: 20px;
+    }
+    .featured-update h2 { margin-top: 0; }
+    .featured-update img, 
+    .featured-update video { max-width: 100%; margin-top: 10px; }
+    .update-meta { margin-top: 10px; color: #777; font-size: 0.9em; }
+    /* Update Tabs */
+    .update-tabs {
+      display: flex;
+      margin-bottom: 20px;
+    }
+    .update-tab {
+      flex: 1;
+      text-align: center;
+      padding: 10px;
+      cursor: pointer;
+      background: #eee;
+      border: 1px solid #ccc;
+    }
+    .update-tab.active {
+      background: #ddd;
+      font-weight: bold;
+    }
+    .update-container {
+      background: #fff;
+      border: 1px solid #ddd;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 4px;
+    }
+    @media (max-width: 768px) {
+      .sidebar { width: 100%; position: relative; border-right: none; }
+      .header { left: 0; }
+      .main-content { margin-left: 0; }
+    }
+  </style>
+</head>
+<body>
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <img class="country-flag" src="{{ url_for('static', filename='flags/' ~ user.country|lower ~ '.png') }}" alt="{{ user.country }} Flag">
+    <div class="profile-section">
+      <img src="{{ url_for('static', filename='profile_pics/' ~ user.profile_pic) }}" alt="Profile Picture">
+      <h3>{{ user.username }}</h3>
+    </div>
+    <nav>
+      <a href="{{ url_for('dashboard') }}">Dashboard Home</a>
+      <a href="{{ url_for('trade') }}">Trade</a>
+      <a href="{{ url_for('staking_route') }}">Staking</a>
+      <a href="{{ url_for('my_stakes') }}">My Stakes</a>
+      <a href="{{ url_for('settings') }}">Settings</a>
+      <a href="{{ url_for('notifications') }}">Notifications</a>
+      <a href="{{ url_for('chat_advisors') }}">Chat</a>
+      <a href="{{ url_for('transfer') }}">Transfer</a>
+      <a href="{{ url_for('news_feed') }}">News Feed</a>
+      <a href="{{ url_for('live_market') }}">Live Market</a>
+      <a href="#" class="mining">Mining</a>
+      <a href="{{ url_for('rewards_bonus') }}" class="rewards">Rewards & Bonus Stage</a>
+      <a href="{{ url_for('logout') }}">Logout</a>
+    </nav>
+  </aside>
+
+  <!-- HEADER -->
+  <header class="header">
+    <h1>News Feed</h1>
+    <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+  </header>
+
+  <!-- MAIN CONTENT -->
+  <div class="main-content">
+    <!-- Featured Update Section -->
+    {% if featured_headline or featured_media or featured_subheading or featured_message %}
+    <div class="featured-update">
+      {% if featured_headline %}
+      <h2>{{ featured_headline }}</h2>
+      {% endif %}
+      {% if featured_media %}
+        {% set ext = featured_media.split('.')[-1].lower() %}
+        {% if ext in ['jpg', 'jpeg', 'png', 'gif'] %}
+          <img src="{{ url_for('static', filename='newsfeed_media/' ~ featured_media) }}" alt="Featured Media">
+        {% elif ext in ['mp4', 'webm', 'ogg'] %}
+          <video controls autoplay>
+            <source src="{{ url_for('static', filename='newsfeed_media/' ~ featured_media) }}" type="video/{{ ext }}">
+            Your browser does not support the video tag.
+          </video>
+        {% endif %}
+      {% endif %}
+      {% if featured_subheading %}
+      <h3>{{ featured_subheading }}</h3>
+      {% endif %}
+      {% if featured_message %}
+      <p>{{ featured_message }}</p>
+      {% endif %}
+      {% if featured_publish %}
+      <div class="update-meta">
+        <small>Published on: {{ featured_publish }}</small>
+      </div>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- Update Tabs -->
+    <div class="update-tabs">
+      <div class="update-tab active" id="latest-tab" onclick="showUpdate('latest')">Latest Update</div>
+      <div class="update-tab" id="previous-tab" onclick="showUpdate('previous')">Previous Update</div>
+    </div>
+    <!-- Latest Update Container -->
+    <div class="update-container" id="latest-update">
+      <div class="update-content">
+        {{ latest_update|safe }}
+      </div>
+      <div class="update-meta">
+        <small>Published on: {{ latest_update_date }}</small>
+      </div>
+    </div>
+    <!-- Previous Update Container (initially hidden) -->
+    <div class="update-container" id="previous-update" style="display:none;">
+      <div class="update-content">
+        {{ previous_update|safe }}
+      </div>
+      <div class="update-meta">
+        <small>Published on: {{ previous_update_date }}</small>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function showUpdate(tab) {
+      var latestTab = document.getElementById('latest-tab');
+      var previousTab = document.getElementById('previous-tab');
+      var latestUpdate = document.getElementById('latest-update');
+      var previousUpdate = document.getElementById('previous-update');
+      
+      if(tab === 'latest') {
+        latestTab.classList.add('active');
+        previousTab.classList.remove('active');
+        latestUpdate.style.display = 'block';
+        previousUpdate.style.display = 'none';
+      } else {
+        previousTab.classList.add('active');
+        latestTab.classList.remove('active');
+        previousUpdate.style.display = 'block';
+        latestUpdate.style.display = 'none';
+      }
+    }
+  </script>
+</body>
+</html>

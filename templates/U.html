@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Admin Dashboard</title>
+  <style>
+    /* Global Styles */
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Arial', sans-serif;
+      background: #f4f4f4;
+      display: flex;
+    }
+
+    /* Sidebar Navigation */
+    .sidebar {
+      width: 250px;
+      height: 100vh;
+      background: #222;
+      color: white;
+      padding-top: 20px;
+      position: fixed;
+      transition: width 0.3s;
+    }
+    .sidebar h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 24px;
+    }
+    .sidebar ul {
+      list-style: none;
+      padding: 0;
+    }
+    .sidebar ul li {
+      padding: 15px 20px;
+      border-bottom: 1px solid #333;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .sidebar ul li:hover {
+      background: #444;
+    }
+    .sidebar ul li i {
+      margin-right: 10px;
+    }
+
+    /* Main Content */
+    .main-content {
+      margin-left: 250px;
+      padding: 20px;
+      width: calc(100% - 250px);
+    }
+
+    /* Header */
+    .header {
+      background: #dc3545;
+      color: white;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-radius: 8px;
+    }
+    .header .profile-pic {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      border: 3px solid white;
+    }
+    .header .user-info {
+      margin-left: 15px;
+    }
+    .header .user-info h1 {
+      margin: 0;
+      font-size: 22px;
+    }
+    .logout-btn {
+      background: #007bff;
+      padding: 10px 15px;
+      border-radius: 4px;
+      color: white;
+      text-decoration: none;
+      font-size: 14px;
+      transition: background 0.3s;
+    }
+    .logout-btn:hover {
+      background: #0056b3;
+    }
+
+    /* Dashboard Cards */
+    .dashboard-container {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+    .card {
+      width: 32%;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease-in-out;
+    }
+    .card:hover {
+      transform: scale(1.05);
+    }
+    .card h3 {
+      margin: 0;
+      font-size: 20px;
+      color: #333;
+    }
+    .card p {
+      font-size: 24px;
+      color: #007bff;
+      margin-top: 10px;
+    }
+
+    /* Crypto Portfolio */
+    .crypto-dropdown {
+      margin-top: 20px;
+      padding: 15px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    select {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+
+    /* Recent Transactions */
+    .transactions {
+      margin-top: 20px;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .transactions table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .transactions table th, .transactions table td {
+      padding: 10px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      padding: 15px;
+      background: #222;
+      color: white;
+      margin-top: 20px;
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <h2>Admin Panel</h2>
+    <ul>
+      <li>📊 Dashboard</li>
+      <li>💰 Transactions</li>
+      <li>⚙️ Settings</li>
+      <li>🚪 Logout</li>
+    </ul>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    
+    <!-- Header -->
+    <div class="header">
+      <div class="user-info">
+        <h1>Welcome, Admin</h1>
+        <p>Balance: $10,000</p>
+      </div>
+      <a class="logout-btn" href="#">Logout</a>
+    </div>
+
+    <!-- Dashboard Cards -->
+    <div class="dashboard-container">
+      <div class="card">
+        <h3>Total Users</h3>
+        <p>1,230</p>
+      </div>
+      <div class="card">
+        <h3>Daily Transactions</h3>
+        <p>$5,450</p>
+      </div>
+      <div class="card">
+        <h3>Crypto Holdings</h3>
+        <p>BTC 0.045</p>
+      </div>
+    </div>
+
+    <!-- Crypto Portfolio -->
+    <div class="crypto-dropdown">
+      <h3>Crypto Portfolio</h3>
+      <select>
+        <option>Bitcoin (BTC) - 0.045</option>
+        <option>Ethereum (ETH) - 2.3</option>
+        <option>Tether (USDT) - 5000</option>
+      </select>
+    </div>
+
+    <!-- Recent Transactions -->
+    <div class="transactions">
+      <h3>Recent Transactions</h3>
+      <table>
+        <tr>
+          <th>Type</th>
+          <th>Amount</th>
+          <th>Status</th>
+        </tr>
+        <tr>
+          <td>Deposit</td>
+          <td>$1,000</td>
+          <td>Completed</td>
+        </tr>
+        <tr>
+          <td>Withdrawal</td>
+          <td>$500</td>
+          <td>Pending</td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      &copy; 2025 Admin Dashboard. All Rights Reserved.
+    </div>
+
+  </div>
+
+</body>
+</html>

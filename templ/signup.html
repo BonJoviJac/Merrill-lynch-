@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signup - Merrill Lynch</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #228BE6;
+        }
+        .container {
+            max-width: 400px;
+            margin-top: 50px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .password-container {
+            position: relative;
+        }
+        .password-toggle {
+            cursor: pointer;
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="https://files.catbox.moe/l9d8yj.png" class="img-fluid d-block mx-auto" width="100">
+        <h3 class="text-center text-primary">Signup</h3>
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=True) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Signup Form -->
+        <form action="/signup" method="POST">
+            <input type="text" name="first_name" class="form-control mb-2" placeholder="First Name" required>
+            <input type="text" name="last_name" class="form-control mb-2" placeholder="Last Name" required>
+            <input type="text" name="username" class="form-control mb-2" placeholder="Username" required>
+            <input type="email" name="email" class="form-control mb-2" placeholder="Email" required>
+            
+            <!-- Password Field -->
+            <div class="password-container">
+                <input type="password" name="password" id="password" class="form-control mb-2" placeholder="Password" required>
+                <img src="https://img.icons8.com/ios/50/228BE6/visible--v1.png" class="password-toggle" id="togglePassword" onclick="togglePassword('password', 'togglePassword')">
+            </div>
+
+            <!-- Confirm Password Field -->
+            <div class="password-container">
+                <input type="password" name="confirm_password" id="confirm_password" class="form-control mb-2" placeholder="Confirm Password" required>
+                <img src="https://img.icons8.com/ios/50/228BE6/visible--v1.png" class="password-toggle" id="toggleConfirmPassword" onclick="togglePassword('confirm_password', 'toggleConfirmPassword')">
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">Signup</button>
+        </form>
+        
+        <p class="text-center mt-2">Already have an account? <a href="/login">Login</a></p>
+    </div>
+
+    <script>
+        function togglePassword(fieldId, iconId) {
+            let field = document.getElementById(fieldId);
+            let icon = document.getElementById(iconId);
+
+            if (field.type === "password") {
+                field.type = "text";
+                icon.src = "https://img.icons8.com/color/48/ophthalmology.png"; // Eye closed (hide)
+            } else {
+                field.type = "password";
+                icon.src = "https://img.icons8.com/ios/50/228BE6/visible--v1.png"; // Eye open (show)
+            }
+        }
+    </script>
+</body>
+</html>

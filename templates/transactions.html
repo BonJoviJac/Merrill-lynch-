@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Transaction History</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #fff; padding: 20px; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+    th { background: #007bff; color: white; }
+    .back-link { margin-top: 20px; display: block; text-decoration: none; color: #007bff; }
+  </style>
+</head>
+<body>
+  <h2>Transaction History for {{ user.username }}</h2>
+  <table>
+    <tr>
+      <th>Type</th>
+      <th>Crypto</th>
+      <th>Amount</th>
+      <th>USD Value</th>
+      <th>Hash</th>
+      <th>Timestamp</th>
+    </tr>
+    {% for tx in transactions %}
+    <tr>
+      <td>{{ tx.transaction_type }}</td>
+      <td>{{ tx.crypto_name }}</td>
+      <td>{{ "%.4f"|format(tx.amount) }}</td>
+      <td>${{ "%.2f"|format(tx.usd_value) }}</td>
+      <td>{{ tx.hash_id }}</td>
+      <td>{{ tx.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  <a class="back-link" href="{{ url_for('dashboard') }}">Back to Dashboard</a>
+</body>
+</html>

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Room</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.4/socket.io.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        #chat-box { height: 300px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; }
+        #typing { font-size: 12px; color: gray; }
+    </style>
+</head>
+<body>
+
+<h2>Chat Room</h2>
+<div id="chat-box"></div>
+<p id="typing"></p>
+
+<input type="text" id="message-input" placeholder="Type a message..." oninput="sendTyping()">
+<button onclick="sendMessage()">Send</button>
+
+<script>
+    var socket = io.connect(window.location.origin);
+
+    function loadMessages() {
+        fetch("/get_messages")
+            .then(response => response.json())
+            .then(messages => {
+                let chatBox = document.getElementById("chat-box");
+                chatBox.innerHTML = ""; // Clear old messages
+
+                messages.forEach(msg => {
+                    let messageElement = document.createElement("p");
+                    messageElement.innerHTML = `<strong>${msg.sender}:</strong> ${msg.message} <span style="font-size: 10px; color: gray;">(${msg.timestamp})</span>`;
+                    chatBox.appendChild(messageElement);
+                });
+
+                chatBox.scrollTop = chatBox.scrollHeight; // Auto-scroll to latest message
+            });
+    }
+
+    function sendMessage() {
+        let input = document.getElementById("message-input");
+        let message = input.value.trim();
+
+        if (message !== "") {
+            socket.emit("send_message", { "message": message });
+            input.value = ""; // Clear input after sending
+        }
+    }
+
+    socket.on("receive_message", function(data) {
+        let chatBox = document.getElementById("chat-box");
+        let messageElement = document.createElement("p");
+        messageElement.innerHTML = `<strong>${data.sender}:</strong> ${data.message} <span style="font-size: 10px; color: gray;">(${data.timestamp})</span>`;
+        chatBox.appendChild(messageElement);
+        chatBox.scrollTop = chatBox.scrollHeight; // Auto-scroll
+    });
+
+    function sendTyping() {
+        socket.emit("typing");
+    }
+
+    socket.on("user_typing", function(data) {
+        let typingIndicator = document.getElementById("typing");
+        typingIndicator.innerText = `${data.username} is typing...`;
+
+        setTimeout(() => { typingIndicator.innerText = ""; }, 3000); // Clear after 3s
+    });
+
+    window.onload = loadMessages; // Load previous messages when page loads
+</script>
+
+</body>
+</html>

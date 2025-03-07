@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Trade Execution</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 700px;
+      margin: auto;
+      background: #fff;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h1 {
+      text-align: center;
+    }
+    .info {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .trade-section {
+      margin-bottom: 20px;
+      padding: 15px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+    .trade-section h2 {
+      margin-top: 0;
+    }
+    .trade-form {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .trade-form label {
+      flex: 1 0 100%;
+      margin-top: 10px;
+    }
+    .trade-form select, .trade-form input {
+      flex: 1;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    .trade-form button {
+      flex: 1 0 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 15px;
+    }
+    .buy-btn {
+      background-color: #28a745;
+      color: white;
+    }
+    .sell-btn {
+      background-color: #dc3545;
+      color: white;
+    }
+    .execution-container {
+      margin-top: 20px;
+      background: #e9ecef;
+      padding: 15px;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Trade Execution</h1>
+    <div class="info">
+      <p>User: {{ user.username }} | USD Balance: ${{ "%.2f"|format(user.balance) }}</p>
+    </div>
+    
+    <!-- Buy Section -->
+    <div class="trade-section">
+      <h2>Buy</h2>
+      <form class="trade-form" method="POST" action="{{ url_for('trade') }}">
+        <input type="hidden" name="trade_type" value="buy">
+        <label for="crypto_name">Select Cryptocurrency:</label>
+        <select name="crypto_name" required>
+          {% for crypto, price in crypto_prices.items() %}
+            <option value="{{ crypto }}">{{ crypto }} (${{ price }})</option>
+          {% endfor %}
+        </select>
+        
+        <label for="quantity">Enter Quantity to Buy:</label>
+        <input type="number" name="quantity" step="0.0001" min="0" required>
+        
+        <label for="leverage">Select Leverage:</label>
+        <select name="leverage" required>
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="5">5</option>
+          <option value="10">10</option>
+          <option value="20">20</option>
+        </select>
+        
+        <button type="submit" class="buy-btn">Buy</button>
+      </form>
+    </div>
+    
+    <!-- Sell Section -->
+    <div class="trade-section">
+      <h2>Sell</h2>
+      <form class="trade-form" method="POST" action="{{ url_for('trade') }}">
+        <input type="hidden" name="trade_type" value="sell">
+        <label for="crypto_name">Select Cryptocurrency:</label>
+        <select name="crypto_name" required>
+          {% for crypto, price in crypto_prices.items() %}
+            <option value="{{ crypto }}">{{ crypto }} (${{ price }})</option>
+          {% endfor %}
+        </select>
+        
+        <label for="quantity">Enter Quantity to Sell:</label>
+        <input type="number" name="quantity" step="0.0001" min="0" required>
+        
+        <label for="leverage">Select Leverage:</label>
+        <select name="leverage" required>
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="5">5</option>
+          <option value="10">10</option>
+          <option value="20">20</option>
+        </select>
+        
+        <button type="submit" class="sell-btn">Sell</button>
+      </form>
+    </div>
+    
+    <!-- Execution Container -->
+    <div class="execution-container">
+      <h3>Trade Execution Details</h3>
+      {% if execution %}
+        {% if execution.type == 'buy' %}
+          <p>Buy Order: {{ execution.quantity }} of {{ execution.crypto }} executed at a total bid of ${{ "%.2f"|format(execution.bid) }} on {{ execution.timestamp }}.</p>
+        {% elif execution.type == 'sell' %}
+          <p>Sell Order: {{ execution.quantity }} of {{ execution.crypto }} executed with ask value of ${{ "%.2f"|format(execution.ask) }}.<br>
+          Profit/Loss: 
+          {% if execution.profit_loss >= 0 %}
+            <span style="color: green;">${{ "%.2f"|format(execution.profit_loss) }} profit</span>
+          {% else %}
+            <span style="color: red;">${{ "%.2f"|format(execution.profit_loss|abs) }} loss</span>
+          {% endif %}
+          on {{ execution.timestamp }}.
+          </p>
+        {% endif %}
+      {% else %}
+        <p>No trades executed yet.</p>
+      {% endif %}
+    </div>
+    
+    <div style="text-align: center; margin-top: 20px;">
+      <a href="{{ url_for('dashboard') }}">Back to Dashboard</a>
+    </div>
+  </div>
+</body>
+</html>

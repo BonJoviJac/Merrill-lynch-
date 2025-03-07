@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Onboarding</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: url('https://www.transparenttextures.com/patterns/white-wall.png');
+            background-color: #f8f9fa;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        h2 {
+            color: #333;
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        select, input, button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+        .hidden {
+            display: none;
+        }
+        .profile-pic {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            display: block;
+            margin: 10px auto;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container" id="step1">
+    <h2>Welcome Admin! 🚀</h2>
+    <p>Let's set up your profile.</p>
+
+    <label>🌍 Where are you from?</label>
+    <select id="country">
+        <option value="🇺🇸">United States</option>
+        <option value="🇬🇧">United Kingdom</option>
+        <option value="🇨🇦">Canada</option>
+        <option value="🇦🇺">Australia</option>
+        <option value="🇮🇳">India</option>
+    </select>
+
+    <label>👤 Gender</label>
+    <select id="gender">
+        <option>Male</option>
+        <option>Female</option>
+    </select>
+
+    <label>🏡 Street Name</label>
+    <input type="text" id="street" placeholder="Enter your street name">
+
+    <label>📅 Date of Birth</label>
+    <input type="date" id="dob">
+
+    <label>🧐 What do you think of being an Admin?</label>
+    <select id="opinion">
+        <option>Excited! 🚀</option>
+        <option>Challenging but fun! 🎯</option>
+        <option>Just a job! 💼</option>
+    </select>
+
+    <button onclick="nextStep()">Next ➡️</button>
+</div>
+
+<div class="container hidden" id="step2">
+    <h2>Upload a Profile Picture 📸</h2>
+    <input type="file" id="profilePicInput" accept="image/*" onchange="previewImage()">
+    <img src="https://via.placeholder.com/100" class="profile-pic" id="profilePic">
+    <button onclick="skipPhoto()">Skip ➡️</button>
+</div>
+
+<script>
+    function nextStep() {
+        document.getElementById('step1').classList.add('hidden');
+        document.getElementById('step2').classList.remove('hidden');
+    }
+
+    function previewImage() {
+        let file = document.getElementById('profilePicInput').files[0];
+        let reader = new FileReader();
+        reader.onload = function () {
+            document.getElementById('profilePic').src = reader.result;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function skipPhoto() {
+        let country = document.getElementById('country').value;
+        let profilePic = document.getElementById('profilePic').src;
+
+        // Save data and redirect to /dashboard
+        localStorage.setItem('admin_country', country);
+        localStorage.setItem('admin_profilePic', profilePic);
+        
+        window.location.href = "/dashboard";
+    }
+</script>
+
+</body>
+</html>

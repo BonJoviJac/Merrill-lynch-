@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Content Editor</title>
+  <!-- FontAwesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <style>
+    body { font-family: Arial, sans-serif; background: #f2f2f2; padding: 20px; }
+    .container {
+      max-width: 900px;
+      margin: auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    h1 { text-align: center; margin-bottom: 20px; }
+    h2 { margin-top: 20px; color: #333; }
+    form { margin-bottom: 30px; }
+    .form-group { margin-bottom: 15px; }
+    label { display: block; font-weight: bold; margin-bottom: 5px; }
+    input[type="text"],
+    input[type="number"],
+    input[type="color"],
+    input[type="datetime-local"],
+    textarea,
+    select { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
+    textarea { resize: vertical; min-height: 60px; }
+    .btn { display: inline-block; padding: 10px 20px; background: #6EC5E9; color: #fff; border: none; border-radius: 4px; cursor: pointer; margin-top: 10px; }
+    .btn:hover { background: #5bb1d0; }
+    .section { border: 1px solid #eee; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+    .section-title { font-size: 1.1rem; margin-bottom: 10px; }
+    /* Banner List */
+    .banner-list { margin-top: 15px; }
+    .banner-item { display: flex; align-items: center; justify-content: space-between; padding: 10px; border-bottom: 1px solid #eee; }
+    .banner-item img { width: 120px; border-radius: 4px; }
+    .banner-actions button { padding: 6px 12px; border: none; border-radius: 4px; background: #d62828; color: #fff; cursor: pointer; }
+    .banner-actions button:hover { background: #b32020; }
+    /* Preview Container */
+    .preview-container { margin-top: 20px; padding: 15px; border: 1px dashed #ccc; border-radius: 8px; }
+    .preview-container h3 { margin-bottom: 10px; }
+    /* Flash Message Preview */
+    .flash-preview {
+      padding: 10px 16px;
+      border-radius: 6px;
+      position: relative;
+      display: inline-block;
+      margin-bottom: 10px;
+    }
+    .flash-preview .close-btn {
+      position: absolute;
+      top: 2px;
+      right: 6px;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    /* Quote Book Preview */
+    .quote-preview { position: relative; padding-top: 30px; }
+    .quote-preview .quote-logo {
+      position: absolute; top: 0; left: 0;
+      width: 24px; height: 24px;
+      object-fit: contain;
+    }
+    .quote-preview blockquote { font-size: 0.95rem; font-style: italic; margin: 0; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Content Editor</h1>
+
+    <!-- Banner Management Section -->
+    <div class="section">
+      <div class="section-title">Banner Management</div>
+      <form action="{{ url_for('content_edit') }}" method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+          <label for="banner_file">Upload Banner Image:</label>
+          <input type="file" name="banner_file" id="banner_file">
+        </div>
+        <div class="form-group">
+          <label for="display_time">Display Time (sec):</label>
+          <input type="number" name="display_time" id="display_time" min="1" value="5">
+        </div>
+        <div class="form-group">
+          <label for="transition">Transition Effect:</label>
+          <select name="transition" id="transition">
+            <option value="slide">Slide</option>
+            <option value="fade">Fade</option>
+            <option value="up">Up</option>
+          </select>
+        </div>
+        <button type="submit" class="btn">Upload Banner</button>
+      </form>
+      <!-- List Current Banners -->
+      <div class="banner-list">
+        <h2>Current Banners</h2>
+        {% for banner in banners %}
+        <div class="banner-item">
+          <img src="{{ url_for('static', filename='banners/' ~ banner.image) }}" alt="Banner Image">
+          <div>
+            <p>Display Time: {{ banner.display_time }} sec</p>
+            <p>Transition: {{ banner.transition }}</p>
+          </div>
+          <div class="banner-actions">
+            <form action="{{ url_for('delete_banner', banner_id=banner.id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this banner?');">
+              <button type="submit"><i class="fas fa-trash-alt"></i> Delete</button>
+            </form>
+          </div>
+        </div>
+        {% else %}
+        <p>No banners uploaded yet.</p>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Flash Message Editor Section -->
+    <div class="section">
+      <div class="section-title">Flash Message Editor</div>
+      <form action="{{ url_for('content_edit') }}" method="POST">
+        <div class="form-group">
+          <label for="flash_message">Flash Message Text:</label>
+          <textarea name="flash_message" id="flash_message" placeholder="Enter flash message">{{ content_settings.flash_message if content_settings and content_settings.flash_message else '' }}</textarea>
+        </div>
+        <div class="form-group">
+          <label for="flash_color">Flash Message Background Color:</label>
+          <input type="color" name="flash_color" id="flash_color" value="{{ content_settings.flash_color if content_settings and content_settings.flash_color else '#d4edda' }}">
+        </div>
+        <button type="submit" class="btn">Update Flash Message</button>
+      </form>
+      <!-- Flash Message Preview -->
+      <div class="preview-container">
+        <h3>Flash Message Preview</h3>
+        <div class="flash-preview" style="background: {{ content_settings.flash_color if content_settings and content_settings.flash_color else '#d4edda' }}; color: #155724;">
+          {{ content_settings.flash_message if content_settings and content_settings.flash_message else 'This is your flash message.' }}
+          <span class="close-btn">&times;</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quote Book Editor Section -->
+    <div class="section">
+      <div class="section-title">Quote Book Editor</div>
+      <form action="{{ url_for('content_edit') }}" method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+          <label for="quote_text">Quote Text:</label>
+          <textarea name="quote_text" id="quote_text" placeholder="Enter inspirational quote">{{ content_settings.quote_text if content_settings and content_settings.quote_text else '' }}</textarea>
+        </div>
+        <div class="form-group">
+          <label for="quote_logo">Quote Logo (small image):</label>
+          <input type="file" name="quote_logo" id="quote_logo">
+        </div>
+        <div class="form-group">
+          <label for="quote_color">Quote Text Color:</label>
+          <input type="color" name="quote_color" id="quote_color" value="{{ content_settings.quote_color if content_settings and content_settings.quote_color else '#555' }}">
+        </div>
+        <div class="form-group">
+          <label for="quote_alignment">Quote Alignment:</label>
+          <select name="quote_alignment" id="quote_alignment">
+            <option value="left" {% if content_settings and content_settings.quote_alignment == 'left' %}selected{% endif %}>Left</option>
+            <option value="center" {% if content_settings and content_settings.quote_alignment == 'center' %}selected{% endif %}>Center</option>
+            <option value="right" {% if content_settings and content_settings.quote_alignment == 'right' %}selected{% endif %}>Right</option>
+          </select>
+        </div>
+        <button type="submit" class="btn">Update Quote Book</button>
+      </form>
+      <!-- Quote Book Preview -->
+      <div class="preview-container">
+        <h3>Quote Book Preview</h3>
+        <div class="quote-preview" style="text-align: {{ content_settings.quote_alignment if content_settings and content_settings.quote_alignment else 'left' }}; color: {{ content_settings.quote_color if content_settings and content_settings.quote_color else '#555' }};">
+          {% if content_settings and content_settings.quote_logo %}
+            <img class="quote-logo" src="{{ url_for('static', filename='banners/' ~ content_settings.quote_logo) }}" alt="Quote Logo">
+          {% endif %}
+          <blockquote>
+            {{ content_settings.quote_text if content_settings and content_settings.quote_text else 'Your inspirational quote here.' }}
+          </blockquote>
+        </div>
+      </div>
+    </div>
+
+    <!-- Transfer Page Editor Section -->
+    <div class="section">
+      <div class="section-title">Transfer Page Editor</div>
+      <form action="{{ url_for('content_edit') }}" method="POST" enctype="multipart/form-data">
+        <!-- Editable Text Container 1 -->
+        <div class="form-group">
+          <label for="transfer_text1">Transfer Text Container 1 Content:</label>
+          <textarea name="transfer_text1" id="transfer_text1" placeholder="Enter text for container 1">{{ content_settings.transfer_text1 if content_settings and content_settings.transfer_text1 else '' }}</textarea>
+        </div>
+        <div class="form-group">
+          <label for="transfer_text_color1">Container 1 Background Color:</label>
+          <input type="color" name="transfer_text_color1" id="transfer_text_color1" value="{{ content_settings.transfer_text_color1 if content_settings and content_settings.transfer_text_color1 else '#f1f1f1' }}">
+        </div>
+        <!-- Editable Text Container 2 -->
+        <div class="form-group">
+          <label for="transfer_text2">Transfer Text Container 2 Content:</label>
+          <textarea name="transfer_text2" id="transfer_text2" placeholder="Enter text for container 2">{{ content_settings.transfer_text2 if content_settings and content_settings.transfer_text2 else '' }}</textarea>
+        </div>
+        <div class="form-group">
+          <label for="transfer_text_color2">Container 2 Background Color:</label>
+          <input type="color" name="transfer_text_color2" id="transfer_text_color2" value="{{ content_settings.transfer_text_color2 if content_settings and content_settings.transfer_text_color2 else '#f1f1f1' }}">
+        </div>
+        <!-- Crypto Payment Details Editor -->
+        <h3>Crypto Payment Details</h3>
+        <!-- Example for BTC -->
+        <div class="form-group">
+          <label for="crypto_BTC_wallet">BTC Wallet Address:</label>
+          <input type="text" name="crypto_details[BTC][wallet]" id="crypto_BTC_wallet" value="{{ content_settings.crypto_details['BTC']['wallet'] if content_settings and content_settings.crypto_details and content_settings.crypto_details['BTC'] and content_settings.crypto_details['BTC']['wallet'] else '' }}">
+        </div>
+        <div class="form-group">
+          <label for="crypto_BTC_logo">BTC Logo Image:</label>
+          <input type="file" name="crypto_details[BTC][logo]" id="crypto_BTC_logo">
+        </div>
+        <div class="form-group">
+          <label for="crypto_BTC_barcode">BTC Barcode Image:</label>
+          <input type="file" name="crypto_details[BTC][barcode]" id="crypto_BTC_barcode">
+        </div>
+        <!-- Example for ETH -->
+        <div class="form-group">
+          <label for="crypto_ETH_wallet">ETH Wallet Address:</label>
+          <input type="text" name="crypto_details[ETH][wallet]" id="crypto_ETH_wallet" value="{{ content_settings.crypto_details['ETH']['wallet'] if content_settings and content_settings.crypto_details and content_settings.crypto_details['ETH'] and content_settings.crypto_details['ETH']['wallet'] else '' }}">
+        </div>
+        <div class="form-group">
+          <label for="crypto_ETH_logo">ETH Logo Image:</label>
+          <input type="file" name="crypto_details[ETH][logo]" id="crypto_ETH_logo">
+        </div>
+        <div class="form-group">
+          <label for="crypto_ETH_barcode">ETH Barcode Image:</label>
+          <input type="file" name="crypto_details[ETH][barcode]" id="crypto_ETH_barcode">
+        </div>
+        <button type="submit" class="btn">Update Transfer Page Settings</button>
+      </form>
+    </div>
+
+    <!-- News Feed Content Editor Section -->
+    <div class="section">
+      <div class="section-title">News Feed Content Editor</div>
+      <form action="{{ url_for('content_edit') }}" method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+          <label for="newsfeed_content">News Feed Content:</label>
+          <textarea name="newsfeed_content" id="newsfeed_content" placeholder="Enter news feed content here">{{ content_settings.newsfeed_content if content_settings and content_settings.newsfeed_content else '' }}</textarea>
+        </div>
+        <div class="form-group">
+          <label for="newsfeed_font">Font Family:</label>
+          <select name="newsfeed_font" id="newsfeed_font">
+            <option value="Arial" {% if content_settings and content_settings.newsfeed_font == 'Arial' %}selected{% endif %}>Arial</option>
+            <option value="Helvetica" {% if content_settings and content_settings.newsfeed_font == 'Helvetica' %}selected{% endif %}>Helvetica</option>
+            <option value="Times New Roman" {% if content_settings and content_settings.newsfeed_font == 'Times New Roman' %}selected{% endif %}>Times New Roman</option>
+            <option value="Georgia" {% if content_settings and content_settings.newsfeed_font == 'Georgia' %}selected{% endif %}>Georgia</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="newsfeed_alignment">Text Alignment:</label>
+          <select name="newsfeed_alignment" id="newsfeed_alignment">
+            <option value="left" {% if content_settings and content_settings.newsfeed_alignment == 'left' %}selected{% endif %}>Left</option>
+            <option value="center" {% if content_settings and content_settings.newsfeed_alignment == 'center' %}selected{% endif %}>Center</option>
+            <option value="right" {% if content_settings and content_settings.newsfeed_alignment == 'right' %}selected{% endif %}>Right</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="newsfeed_media">Upload Media (Image/Video):</label>
+          <input type="file" name="newsfeed_media" id="newsfeed_media">
+        </div>
+        <div class="form-group">
+          <label for="newsfeed_media_position">Media Position:</label>
+          <select name="newsfeed_media_position" id="newsfeed_media_position">
+            <option value="top" {% if content_settings and content_settings.newsfeed_media_position == 'top' %}selected{% endif %}>Top</option>
+            <option value="bottom" {% if content_settings and content_settings.newsfeed_media_position == 'bottom' %}selected{% endif %}>Bottom</option>
+            <option value="left" {% if content_settings and content_settings.newsfeed_media_position == 'left' %}selected{% endif %}>Left</option>
+            <option value="right" {% if content_settings and content_settings.newsfeed_media_position == 'right' %}selected{% endif %}>Right</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="newsfeed_publish">Publish Date & Time:</label>
+          <input type="datetime-local" name="newsfeed_publish" id="newsfeed_publish" value="{{ content_settings.newsfeed_publish if content_settings and content_settings.newsfeed_publish else '' }}">
+        </div>
+        <button type="submit" class="btn">Update News Feed Content</button>
+      </form>
+    </div>
+
+    <!-- Featured News Feed Update Editor Section -->
+    <div class="section">
+      <div class="section-title">Featured News Feed Update Editor</div>
+      <form action="{{ url_for('content_edit') }}" method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+          <label for="newsfeed_headline">Head Topic Text:</label>
+          <input type="text" name="newsfeed_headline" id="newsfeed_headline" placeholder="Enter the main headline" value="{{ content_settings.newsfeed_headline if content_settings and content_settings.newsfeed_headline else '' }}">
+        </div>
+        <div class="form-group">
+          <label for="newsfeed_featured_media">Upload Featured Media (Image/Video):</label>
+          <input type="file" name="newsfeed_featured_media" id="newsfeed_featured_media">
+        </div>
+        <div class="form-group">
+          <label for="newsfeed_subheading">Sub Heading Text:</label>
+          <input type="text" name="newsfeed_subheading" id="newsfeed_subheading" placeholder="Enter subheading" value="{{ content_settings.newsfeed_subheading if content_settings and content_settings.newsfeed_subheading else '' }}">
+        </div>
+        <div class="form-group">
+          <label for="newsfeed_message">Explanation / Message:</label>
+          <textarea name="newsfeed_message" id="newsfeed_message" placeholder="Enter detailed explanation or message">{{ content_settings.newsfeed_message if content_settings and content_settings.newsfeed_message else '' }}</textarea>
+        </div>
+        <button type="submit" class="btn">Update Featured News Feed Update</button>
+      </form>
+    </div>
+
+    <!-- Combined Save Changes Button (optional if using separate submission) -->
+    <div style="text-align: center; margin-top: 20px;">
+      <button class="btn" onclick="alert('Changes submitted!');">Save All Changes</button>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Staking</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      padding: 20px;
+    }
+    .container {
+      max-width: 600px;
+      background: #fff;
+      margin: auto;
+      padding: 20px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      text-align: center;
+    }
+    h2 {
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+      text-align: left;
+    }
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 15px;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    .locked-container, .countdown-container {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 8px;
+      border: 1px solid #007bff;
+      background: #e9ecef;
+      text-align: center;
+    }
+    .locked-container h3, .countdown-container h3 {
+      margin: 0 0 10px;
+      color: #007bff;
+    }
+    .insufficient {
+      background: #fff3cd;
+      color: #856404;
+      padding: 10px;
+      border-radius: 4px;
+      margin-bottom: 20px;
+    }
+    .back-link {
+      margin-top: 20px;
+      display: block;
+      text-decoration: none;
+      color: #007bff;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Stake Your Crypto</h2>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="insufficient">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+    
+    <form method="POST" action="{{ url_for('staking') }}">
+      <label for="crypto_name">Select Cryptocurrency:</label>
+      <select name="crypto_name" required>
+        {% for crypto in crypto_prices.keys() %}
+          <option value="{{ crypto }}">{{ crypto }}</option>
+        {% endfor %}
+      </select>
+      
+      <label for="amount">Amount to Stake:</label>
+      <input type="number" name="amount" step="0.0001" min="0" required>
+      
+      <label for="staking_period">Select Staking Period:</label>
+      <select name="staking_period" required>
+        <option value="7 days">7 days</option>
+        <option value="30 days">30 days</option>
+        <option value="70 days">70 days</option>
+        <option value="1 year">1 year</option>
+      </select>
+      
+      <button type="submit">Initiate Staking</button>
+    </form>
+    
+    {% if new_stake %}
+      <!-- Locked Crypto Details Container -->
+      <div class="locked-container">
+        <h3>Locked Asset Details</h3>
+        <p>Crypto: {{ new_stake.crypto_name }}</p>
+        <p>Amount Locked: {{ "%.4f"|format(new_stake.amount) }}</p>
+        <p>USD Equivalent: ${{ "%.2f"|format(new_stake.amount * crypto_prices[new_stake.crypto_name]) }}</p>
+      </div>
+      
+      <!-- Countdown and Profit Counter Container -->
+      <div class="countdown-container">
+        <h3>Staking Countdown & Profit</h3>
+        <p>Staking Ends: {{ new_stake.end_date.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+        <p>Expected Reward: {{ "%.4f"|format(new_stake.reward) }}</p>
+        <p>Profit Counter: <span id="profitCounter">0.0000</span></p>
+      </div>
+      
+      <script>
+        // Example JavaScript for profit counter animation.
+        // Replace newStakeRewardIncrement with your actual calculation.
+        let profitElem = document.getElementById('profitCounter');
+        let currentProfit = 0.0000;
+        let newStakeRewardIncrement = {{ new_stake.reward / 1000 if new_stake and new_stake.reward else 0 }};
+        setInterval(function() {
+          currentProfit += newStakeRewardIncrement;
+          profitElem.textContent = currentProfit.toFixed(4);
+        }, 1000);
+      </script>
+    {% endif %}
+    
+    <a class="back-link" href="{{ url_for('dashboard') }}">Back to Dashboard</a>
+  </div>
+</body>
+</html>

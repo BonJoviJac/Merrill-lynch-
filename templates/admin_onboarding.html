@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Admin Onboarding</title>
+  <style>
+    body {
+      background: #007bff; /* Blue background */
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+    .paper-container {
+      background: white;
+      max-width: 450px;
+      margin: 30px auto;
+      padding: 30px;
+      border-radius: 8px;
+      border: 1px solid #ffcccc;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h2 { margin-bottom: 20px; }
+    input, select, button {
+      width: 90%;
+      padding: 10px;
+      margin: 10px auto;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+    button {
+      background: #007bff;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover { background: #0056b3; }
+    .step { display: none; }
+    .step.active { display: block; }
+    .progress { width: 90%; height: 5px; background: #ddd; margin: 20px auto; border-radius: 3px; }
+    .progress-bar { width: 0%; height: 100%; background: #007bff; border-radius: 3px; }
+    .gender-group {
+      display: flex;
+      justify-content: space-around;
+      margin: 10px 0;
+    }
+    .gender-group label {
+      cursor: pointer;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <div class="paper-container">
+    <h2>Admin Onboarding</h2>
+    <div class="progress"><div class="progress-bar" id="progressBar"></div></div>
+    <form action="{{ url_for('admin_onboarding') }}" method="POST" enctype="multipart/form-data" id="onboardForm">
+      <!-- Step 1: Basic Information -->
+      <div class="step active" id="step1">
+        <!-- Country Selection with all flags -->
+        <label for="country">Select Your Country</label>
+        <select name="country_name" id="country" required>
+          <option value="">Select your country</option>
+          <option value="Afghanistan" data-code="+93" data-flag="🇦🇫">🇦🇫 Afghanistan (+93)</option>
+          <option value="Albania" data-code="+355" data-flag="🇦🇱">🇦🇱 Albania (+355)</option>
+          <option value="Algeria" data-code="+213" data-flag="🇩🇿">🇩🇿 Algeria (+213)</option>
+          <option value="Andorra" data-code="+376" data-flag="🇦🇩">🇦🇩 Andorra (+376)</option>
+          <option value="Angola" data-code="+244" data-flag="🇦🇴">🇦🇴 Angola (+244)</option>
+          <option value="Antigua and Barbuda" data-code="+1-268" data-flag="🇦🇬">🇦🇬 Antigua and Barbuda (+1-268)</option>
+          <option value="Argentina" data-code="+54" data-flag="🇦🇷">🇦🇷 Argentina (+54)</option>
+          <option value="Armenia" data-code="+374" data-flag="🇦🇲">🇦🇲 Armenia (+374)</option>
+          <option value="Australia" data-code="+61" data-flag="🇦🇺">🇦🇺 Australia (+61)</option>
+          <option value="Austria" data-code="+43" data-flag="🇦🇹">🇦🇹 Austria (+43)</option>
+          <option value="Azerbaijan" data-code="+994" data-flag="🇦🇿">🇦🇿 Azerbaijan (+994)</option>
+          <option value="Bahamas" data-code="+1-242" data-flag="🇧🇸">🇧🇸 Bahamas (+1-242)</option>
+          <option value="Bahrain" data-code="+973" data-flag="🇧🇭">🇧🇭 Bahrain (+973)</option>
+          <option value="Bangladesh" data-code="+880" data-flag="🇧🇩">🇧🇩 Bangladesh (+880)</option>
+          <option value="Barbados" data-code="+1-246" data-flag="🇧🇧">🇧🇧 Barbados (+1-246)</option>
+          <option value="Belarus" data-code="+375" data-flag="🇧🇾">🇧🇾 Belarus (+375)</option>
+          <option value="Belgium" data-code="+32" data-flag="🇧🇪">🇧🇪 Belgium (+32)</option>
+          <option value="Belize" data-code="+501" data-flag="🇧🇿">🇧🇿 Belize (+501)</option>
+          <option value="Benin" data-code="+229" data-flag="🇧🇯">🇧🇯 Benin (+229)</option>
+          <option value="Bhutan" data-code="+975" data-flag="🇧🇹">🇧🇹 Bhutan (+975)</option>
+          <option value="Bolivia" data-code="+591" data-flag="🇧🇴">🇧🇴 Bolivia (+591)</option>
+          <option value="Bosnia and Herzegovina" data-code="+387" data-flag="🇧🇦">🇧🇦 Bosnia and Herzegovina (+387)</option>
+          <option value="Botswana" data-code="+267" data-flag="🇧🇼">🇧🇼 Botswana (+267)</option>
+          <option value="Brazil" data-code="+55" data-flag="🇧🇷">🇧🇷 Brazil (+55)</option>
+          <option value="Brunei" data-code="+673" data-flag="🇧🇳">🇧🇳 Brunei (+673)</option>
+          <option value="Bulgaria" data-code="+359" data-flag="🇧🇬">🇧🇬 Bulgaria (+359)</option>
+          <option value="Burkina Faso" data-code="+226" data-flag="🇧🇫">🇧🇫 Burkina Faso (+226)</option>
+          <option value="Burundi" data-code="+257" data-flag="🇧🇮">🇧🇮 Burundi (+257)</option>
+          <option value="Cambodia" data-code="+855" data-flag="🇰🇭">🇰🇭 Cambodia (+855)</option>
+          <option value="Cameroon" data-code="+237" data-flag="🇨🇲">🇨🇲 Cameroon (+237)</option>
+          <option value="Canada" data-code="+1" data-flag="🇨🇦">🇨🇦 Canada (+1)</option>
+          <option value="Central African Republic" data-code="+236" data-flag="🇨🇫">🇨🇫 Central African Republic (+236)</option>
+          <option value="Chad" data-code="+235" data-flag="🇹🇩">🇹🇩 Chad (+235)</option>
+          <option value="Chile" data-code="+56" data-flag="🇨🇱">🇨🇱 Chile (+56)</option>
+          <option value="China" data-code="+86" data-flag="🇨🇳">🇨🇳 China (+86)</option>
+          <option value="Colombia" data-code="+57" data-flag="🇨🇴">🇨🇴 Colombia (+57)</option>
+          <option value="Comoros" data-code="+269" data-flag="🇰🇲">🇰🇲 Comoros (+269)</option>
+          <option value="Congo (Republic)" data-code="+242" data-flag="🇨🇬">🇨🇬 Congo (Republic) (+242)</option>
+          <option value="Costa Rica" data-code="+506" data-flag="🇨🇷">🇨🇷 Costa Rica (+506)</option>
+          <option value="Croatia" data-code="+385" data-flag="🇭🇷">🇭🇷 Croatia (+385)</option>
+          <option value="Cuba" data-code="+53" data-flag="🇨🇺">🇨🇺 Cuba (+53)</option>
+          <option value="Cyprus" data-code="+357" data-flag="🇨🇾">🇨🇾 Cyprus (+357)</option>
+          <option value="Czechia" data-code="+420" data-flag="🇨🇿">🇨🇿 Czechia (+420)</option>
+          <option value="Denmark" data-code="+45" data-flag="🇩🇰">🇩🇰 Denmark (+45)</option>
+          <option value="Dominica" data-code="+1-767" data-flag="🇩🇲">🇩🇲 Dominica (+1-767)</option>
+          <option value="Egypt" data-code="+20" data-flag="🇪🇬">🇪🇬 Egypt (+20)</option>
+          <option value="Estonia" data-code="+372" data-flag="🇪🇪">🇪🇪 Estonia (+372)</option>
+          <option value="Ethiopia" data-code="+251" data-flag="🇪🇹">🇪🇹 Ethiopia (+251)</option>
+          <option value="Finland" data-code="+358" data-flag="🇫🇮">🇫🇮 Finland (+358)</option>
+          <option value="France" data-code="+33" data-flag="🇫🇷">🇫🇷 France (+33)</option>
+          <option value="Germany" data-code="+49" data-flag="🇩🇪">🇩🇪 Germany (+49)</option>
+          <option value="Greece" data-code="+30" data-flag="🇬🇷">🇬🇷 Greece (+30)</option>
+          <option value="India" data-code="+91" data-flag="🇮🇳">🇮🇳 India (+91)</option>
+          <option value="Indonesia" data-code="+62" data-flag="🇮🇩">🇮🇩 Indonesia (+62)</option>
+          <option value="Iran" data-code="+98" data-flag="🇮🇷">🇮🇷 Iran (+98)</option>
+          <option value="Ireland" data-code="+353" data-flag="🇮🇪">🇮🇪 Ireland (+353)</option>
+          <option value="Israel" data-code="+972" data-flag="🇮🇱">🇮🇱 Israel (+972)</option>
+          <option value="Italy" data-code="+39" data-flag="🇮🇹">🇮🇹 Italy (+39)</option>
+          <option value="Jamaica" data-code="+1-876" data-flag="🇯🇲">🇯🇲 Jamaica (+1-876)</option>
+          <option value="Japan" data-code="+81" data-flag="🇯🇵">🇯🇵 Japan (+81)</option>
+          <option value="Mexico" data-code="+52" data-flag="🇲🇽">🇲🇽 Mexico (+52)</option>
+          <option value="Russia" data-code="+7" data-flag="🇷🇺">🇷🇺 Russia (+7)</option>
+          <option value="United States" data-code="+1" data-flag="🇺🇸">🇺🇸 United States (+1)</option>
+          <!-- (You can add all remaining countries in a similar fashion.) -->
+        </select>
+        <!-- Hidden fields to capture dialing code and flag -->
+        <input type="hidden" name="country_code" id="country_code">
+        <input type="hidden" name="country_flag" id="country_flag">
+        
+        <!-- Date of Birth (must be 18+) -->
+        <label for="dob">Date of Birth</label>
+        <input type="date" id="dob" name="dob" required>
+        
+        <!-- Gender Selection -->
+        <div class="gender-group">
+          <label><input type="radio" name="gender" value="Male" required> ♂️ Male</label>
+          <label><input type="radio" name="gender" value="Female" required> ♀️ Female</label>
+        </div>
+        
+        <!-- Street Name -->
+        <input type="text" name="street_name" placeholder="Street Name" value="{{ admin.street_name or '' }}" required>
+        
+        <!-- Opinion -->
+        <input type="text" name="opinion" placeholder="What do you think of being an Admin?" value="{{ admin.opinion or '' }}" required>
+        
+        <button type="button" onclick="nextStep()">Next</button>
+      </div>
+      
+      <!-- Step 2: Profile Picture Upload -->
+      <div class="step" id="step2">
+        <p>Upload Profile Picture</p>
+        <div id="picPreview" style="margin: 10px auto; width: 100px; height: 100px; border: 1px dashed #ccc; border-radius: 50%; cursor: pointer;" onclick="document.getElementById('fileInput').click()">
+          {% if admin.profile_pic %}
+            <img src="{{ url_for('static', filename='profile_pics/' + admin.profile_pic) }}" alt="Profile" style="width: 100%; height: 100%; border-radius: 50%;">
+          {% else %}
+            <span>Upload</span>
+          {% endif %}
+        </div>
+        <input type="file" id="fileInput" name="profile_pic" style="display: none;" accept="image/*">
+        <!-- Hidden field for default image URL if no file is uploaded -->
+        <input type="hidden" name="profile_pic_url" id="profile_pic_url">
+        <button type="button" onclick="prevStep()">Back</button>
+        <button type="submit">Finish Onboarding</button>
+      </div>
+    </form>
+  </div>
+  
+  <script>
+    // --- Set maximum date for DOB (18 years old) ---
+    const dobInput = document.getElementById('dob');
+    const today = new Date();
+    const year = today.getFullYear() - 18;
+    const month = (today.getMonth()+1).toString().padStart(2, '0');
+    const day = today.getDate().toString().padStart(2, '0');
+    dobInput.max = `${year}-${month}-${day}`;
+
+    // --- Update country hidden fields ---
+    const countrySelect = document.getElementById('country');
+    const countryCodeInput = document.getElementById('country_code');
+    const countryFlagInput = document.getElementById('country_flag');
+    countrySelect.addEventListener('change', function() {
+      const selectedOption = this.options[this.selectedIndex];
+      const code = selectedOption.getAttribute('data-code') || '';
+      const flag = selectedOption.getAttribute('data-flag') || '';
+      countryCodeInput.value = code;
+      countryFlagInput.value = flag;
+    });
+
+    // --- Step-by-Step Navigation ---
+    let currentStep = 1;
+    const steps = document.querySelectorAll('.step');
+    const progressBar = document.getElementById('progressBar');
+    function nextStep() {
+      if(currentStep < steps.length) {
+        steps[currentStep-1].classList.remove('active');
+        currentStep++;
+        steps[currentStep-1].classList.add('active');
+        updateProgress();
+      }
+    }
+    function prevStep() {
+      if(currentStep > 1) {
+        steps[currentStep-1].classList.remove('active');
+        currentStep--;
+        steps[currentStep-1].classList.add('active');
+        updateProgress();
+      }
+    }
+    function updateProgress() {
+      progressBar.style.width = ((currentStep-1) / (steps.length-1)) * 100 + '%';
+    }
+
+    // --- Profile Picture Preview ---
+    const fileInput = document.getElementById('fileInput');
+    const picPreview = document.getElementById('picPreview');
+    fileInput.addEventListener('change', function(event) {
+      let reader = new FileReader();
+      reader.onload = function(){
+        picPreview.innerHTML = '<img src="'+reader.result+'" style="width:100%; height:100%; border-radius:50%;">';
+      }
+      if(event.target.files[0]) {
+        reader.readAsDataURL(event.target.files[0]);
+      }
+    });
+
+    // --- Default Profile Pictures ---
+    const maleDefaults = [
+      "https://files.catbox.moe/1nq0v5.png",
+      "https://files.catbox.moe/aptcve.png",
+      "https://files.catbox.moe/y4nl42.png",
+      "https://files.catbox.moe/o6jqi8.png"
+    ];
+    const femaleDefaults = [
+      "https://files.catbox.moe/hcsbev.png",
+      "https://files.catbox.moe/4tin25.png",
+      "https://files.catbox.moe/087gg0.png"
+    ];
+
+    // --- On Form Submit: If no file is uploaded, set a default image based on gender ---
+    const onboardForm = document.getElementById('onboardForm');
+    onboardForm.addEventListener('submit', function(event) {
+      if(!fileInput.files.length) {
+        const genderRadios = document.getElementsByName('gender');
+        let selectedGender = "";
+        for (let radio of genderRadios) {
+          if(radio.checked) {
+            selectedGender = radio.value;
+            break;
+          }
+        }
+        let defaultPic = "";
+        if(selectedGender === "Female") {
+          defaultPic = femaleDefaults[Math.floor(Math.random() * femaleDefaults.length)];
+        } else {
+          defaultPic = maleDefaults[Math.floor(Math.random() * maleDefaults.length)];
+        }
+        document.getElementById('profile_pic_url').value = defaultPic;
+      }
+    });
+  </script>
+</body>
+</html>

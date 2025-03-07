@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Staking - User Dashboard</title>
+  <!-- FontAwesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <style>
+    /* Global Reset & Fonts */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background-color: #f2f2f2; }
+    
+    /* Dashboard Layout */
+    .dashboard-container {
+      display: flex;
+      height: 100vh;
+    }
+    .sidebar {
+      width: 240px;
+      background: #fff;
+      border-right: 1px solid #ccc;
+      padding: 20px;
+    }
+    .sidebar .profile-section {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .sidebar .profile-section img {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 10px;
+    }
+    .sidebar .profile-section h3 { font-size: 1.1rem; color: #333; }
+    .sidebar nav a {
+      display: block;
+      text-decoration: none;
+      color: #333;
+      padding: 10px 0;
+      border-bottom: 1px solid #eee;
+      font-size: 0.95rem;
+    }
+    .sidebar nav a:hover { background: #f2f2f2; }
+    .sidebar nav a.extra { font-weight: bold; color: #2f9e44; }
+
+    /* Main Content */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .header {
+      background-color: #6EC5E9;
+      color: #fff;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .header h2 { font-size: 1.25rem; }
+    .header .logout-btn {
+      text-decoration: none;
+      font-size: 0.9rem;
+      padding: 6px 12px;
+      border: 1px solid #fff;
+      border-radius: 4px;
+      color: #fff;
+    }
+    .header .logout-btn:hover { background: #fff; color: #6EC5E9; }
+    
+    /* Flash Message */
+    .flash-message {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+      padding: 10px 16px;
+      margin: 10px 20px;
+      border-radius: 6px;
+      position: relative;
+      animation: fadeIn 0.5s ease-in-out;
+    }
+    .flash-message .close-btn {
+      position: absolute;
+      top: 4px;
+      right: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+
+    /* Content Area */
+    .content-area {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+    }
+    .content-area h3 { color: #333; margin-bottom: 15px; }
+    
+    /* Staking Form Container */
+    .staking-container {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      max-width: 600px;
+      margin: auto;
+      animation: fadeInUp 0.8s ease-out;
+    }
+    .staking-container form {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      align-items: flex-end;
+    }
+    .staking-container .form-group {
+      flex: 1 1 200px;
+      display: flex;
+      flex-direction: column;
+    }
+    .staking-container label {
+      font-size: 0.85rem;
+      margin-bottom: 4px;
+      color: #333;
+    }
+    .staking-container input,
+    .staking-container select {
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 0.9rem;
+      transition: border-color 0.3s;
+    }
+    .staking-container input:focus,
+    .staking-container select:focus {
+      border-color: #6EC5E9;
+      outline: none;
+    }
+    .staking-container button {
+      padding: 10px 20px;
+      background: #2f9e44;
+      border: none;
+      color: #fff;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      margin-top: 10px;
+      transition: background 0.3s;
+    }
+    .staking-container button:hover { background: #278c3e; }
+    .reward-display {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      font-size: 0.9rem;
+      background: #e9f7ef;
+      border: 1px solid #c3e6cb;
+      border-radius: 4px;
+      text-align: center;
+      color: #155724;
+    }
+    .error-message {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      font-size: 0.9rem;
+      background: #f8d7da;
+      border: 1px solid #f5c6cb;
+      border-radius: 4px;
+      text-align: center;
+      color: #721c24;
+      display: none;
+    }
+
+    /* Staking Progress Container */
+    .staking-progress {
+      background: #fff;
+      border-radius: 12px;
+      padding: 20px;
+      margin: 20px auto;
+      max-width: 600px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      text-align: center;
+      animation: fadeInUp 0.8s ease-out;
+    }
+    .countdown-timer {
+      font-size: 1.2rem;
+      font-weight: bold;
+      margin: 10px 0;
+      color: #2f9e44;
+    }
+
+    /* Inspiration Container */
+    .inspiration-container {
+      background: #fff;
+      border-radius: 12px;
+      padding: 20px;
+      margin: 20px auto;
+      max-width: 600px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      text-align: center;
+      font-style: italic;
+      color: #555;
+      animation: fadeIn 0.8s ease-out;
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <div class="dashboard-container">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="profile-section">
+        {% if user.profile_pic and user.profile_pic|trim %}
+          <img src="{{ url_for('static', filename='profile_pics/' ~ user.profile_pic) }}" alt="Profile Picture">
+        {% elif user.profile_pic_url and user.profile_pic_url|trim %}
+          <img src="{{ user.profile_pic_url }}" alt="Default Profile Picture">
+        {% else %}
+          <img src="https://files.catbox.moe/1nq0v5.png" alt="Default Profile Picture">
+        {% endif %}
+        <h3>{{ user.username }}</h3>
+        {% if user.country and user.country_flag %}
+          <p>{{ user.country }} {{ user.country_flag }}</p>
+        {% endif %}
+      </div>
+      <nav>
+        <a href="{{ url_for('dashboard') }}">Dashboard Home</a>
+        <a href="{{ url_for('trade') }}">Trade</a>
+        <a href="{{ url_for('staking_route') }}">Staking</a>
+        <a href="{{ url_for('my_stakes') }}">My Stakes</a>
+        <a href="{{ url_for('settings') }}">Settings</a>
+        <a href="{{ url_for('notifications') }}">Notifications</a>
+        <a href="{{ url_for('chat_advisors') }}">Chat <span id="dashboardChatBadge" style="display:none; background:red; color:white; border-radius:50%; padding:2px 6px; font-size:0.75rem;">New</span></a>
+        <a href="{{ url_for('transfer') }}">Transfer</a>
+        <a href="{{ url_for('news_feed') }}">News Feed</a>
+        <a href="{{ url_for('live_market') }}">Live Market</a>
+        <a href="{{ url_for('mining') }}" class="mining">Mining</a>
+        <a href="{{ url_for('rewards_bonus') }}" class="rewards">Rewards & Bonus Stage</a>
+        <a href="{{ url_for('logout') }}">Logout</a>
+      </nav>
+    </aside>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+      <div class="header">
+        <h2>Staking</h2>
+        <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+      </div>
+      
+      <!-- Flash Message (if any) -->
+      {% if new_stake %}
+      <div class="flash-message" id="flashMessage">
+        Staking initiated successfully!
+        <span class="close-btn" onclick="document.getElementById('flashMessage').style.display='none'">&times;</span>
+      </div>
+      {% endif %}
+      
+      <!-- Staking Form -->
+      <div class="content-area">
+        <div class="staking-container">
+          <h3>Stake Your Crypto</h3>
+          <form action="{{ url_for('staking_route') }}" method="POST" id="stakingForm">
+            <div class="form-group">
+              <label for="crypto_name">Select Cryptocurrency</label>
+              <select name="crypto_name" id="crypto_name" required>
+                {% for crypto in crypto_prices.keys() %}
+                  <option value="{{ crypto }}">{{ crypto }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="amount">Amount to Stake</label>
+              <input type="number" name="amount" id="amount" step="0.0001" required>
+            </div>
+            <div class="form-group">
+              <label for="staking_period">Staking Period</label>
+              <select name="staking_period" id="staking_period" required>
+                <option value="7 days">7 days</option>
+                <option value="30 days">30 days</option>
+                <option value="70 days">70 days</option>
+                <option value="1 year">1 year</option>
+              </select>
+            </div>
+            <button type="submit" id="submitBtn">Initiate Staking</button>
+          </form>
+          <!-- Dynamic Reward & Validation Display -->
+          <div class="reward-display" id="rewardDisplay">Estimated Reward: 0.0000 (<span id="rewardUSD">$0.00</span>)</div>
+          <div class="error-message" id="errorMessage">Insufficient balance for staking!</div>
+        </div>
+        
+        <!-- Staking Progress: Displayed if new_stake exists -->
+        {% if new_stake %}
+        <div class="staking-progress" id="stakingProgress" data-end="{{ new_stake.end_date.isoformat() }}">
+          <h3>Your Stake is Active!</h3>
+          <p>Your staking will end in:</p>
+          <div class="countdown-timer" id="countdownTimer">Loading...</div>
+          <p>The reward of <strong>{{ new_stake.reward }}</strong> (in crypto) will be sent upon completion.</p>
+        </div>
+        {% endif %}
+        
+        <!-- Inspiration Container -->
+        <div class="inspiration-container">
+          <p>Staking is a powerful way to grow your crypto holdings by earning passive income. The longer you stake, the higher your rewards – invest in your future today!</p>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+
+  <!-- JavaScript for dynamic interactions -->
+  <script>
+    // Assume these variables are passed from the backend
+    const cryptoPrices = {{ crypto_prices|tojson }};
+    // Example: user_holdings should be passed as a dictionary { "Bitcoin (BTC)": 0.05, ... }
+    const userHoldings = {{ user_holdings|tojson }};
+    
+    // Define reward percentages matching your backend logic
+    const rewardPercentages = {
+      "7 days": 0.01,
+      "30 days": 0.05,
+      "70 days": 0.10,
+      "1 year": 0.20
+    };
+
+    // Grab DOM elements
+    const amountInput = document.getElementById('amount');
+    const stakingPeriodSelect = document.getElementById('staking_period');
+    const cryptoSelect = document.getElementById('crypto_name');
+    const rewardDisplay = document.getElementById('rewardDisplay');
+    const rewardUSDDisplay = document.getElementById('rewardUSD');
+    const errorMessage = document.getElementById('errorMessage');
+    const submitBtn = document.getElementById('submitBtn');
+
+    // Function to update the estimated reward and validate balance
+    function updateRewardAndValidation() {
+      const amount = parseFloat(amountInput.value) || 0;
+      const period = stakingPeriodSelect.value;
+      const selectedCrypto = cryptoSelect.value;
+      const percentage = rewardPercentages[period] || 0;
+      const reward = amount * percentage;
+      const cryptoPrice = cryptoPrices[selectedCrypto] || 0;
+      const rewardUSD = reward * cryptoPrice;
+
+      // Update reward display
+      rewardDisplay.textContent = `Estimated Reward: ${reward.toFixed(4)} (`;
+      rewardUSDDisplay.textContent = `$${rewardUSD.toFixed(2)}`;
+      rewardDisplay.append(")");
+
+      // Validate against user's available balance for the selected crypto
+      const availableBalance = parseFloat(userHoldings[selectedCrypto]) || 0;
+      if(amount > availableBalance) {
+        errorMessage.style.display = 'block';
+        submitBtn.disabled = true;
+      } else {
+        errorMessage.style.display = 'none';
+        submitBtn.disabled = false;
+      }
+    }
+
+    // Listen for changes on inputs
+    amountInput.addEventListener('input', updateRewardAndValidation);
+    stakingPeriodSelect.addEventListener('change', updateRewardAndValidation);
+    cryptoSelect.addEventListener('change', updateRewardAndValidation);
+
+    // Countdown timer for staking progress (if the element exists)
+    const countdownTimerEl = document.getElementById('countdownTimer');
+    if (countdownTimerEl && document.getElementById('stakingProgress')) {
+      const stakingProgressEl = document.getElementById('stakingProgress');
+      // Get the end date from data attribute (assumes ISO string)
+      const endDate = new Date(stakingProgressEl.getAttribute('data-end'));
+
+      function updateCountdown() {
+        const now = new Date();
+        const diff = endDate - now;
+        if (diff <= 0) {
+          countdownTimerEl.textContent = "Completed!";
+          clearInterval(countdownInterval);
+          return;
+        }
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+        const minutes = Math.floor((diff / (1000 * 60)) % 60);
+        const seconds = Math.floor((diff / 1000) % 60);
+        countdownTimerEl.textContent = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+      }
+      updateCountdown(); // initial call
+      const countdownInterval = setInterval(updateCountdown, 1000);
+    }
+  </script>
+</body>
+</html>

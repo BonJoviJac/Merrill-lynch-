@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>My Stakes</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #fff; padding: 20px; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+    th { background: #007bff; color: white; }
+    a { display: block; margin-top: 20px; text-decoration: none; color: #007bff; }
+  </style>
+</head>
+<body>
+  <h2>Active Stakes for {{ user.username }}</h2>
+  <table>
+    <tr>
+      <th>Crypto</th>
+      <th>Amount</th>
+      <th>Staking Period</th>
+      <th>End Date</th>
+      <th>Reward</th>
+    </tr>
+    {% for stake in stakes %}
+    <tr>
+      <td>{{ stake.crypto_name }}</td>
+      <td>{{ "%.4f"|format(stake.amount) }}</td>
+      <td>{{ stake.staking_period }}</td>
+      <td>{{ stake.end_date.strftime("%Y-%m-%d %H:%M:%S") if stake.end_date else "N/A" }}</td>
+      <td>{{ "%.4f"|format(stake.reward) }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  <a href="{{ url_for('dashboard') }}">Back to Dashboard</a>
+</body>
+</html>
