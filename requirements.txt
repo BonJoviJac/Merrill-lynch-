@@ -5,3 +5,5 @@ flask-wtf
 flask-login
 Flask-SocketIO
 Flask-Migrate
+Flask-Argon2
+
